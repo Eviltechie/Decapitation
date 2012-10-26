@@ -1,0 +1,14 @@
+name: Decapitation
+version: '${project.version}'
+author: Eviltechie
+website: http://joe.to
+main: to.joe.decapitation.Decapitation
+commands:
+  setname:
+    description: Sets the name of a skull
+    permission: decapitation.setname
+    permission-message: Who do you think you are?
+    usage: /<command> playername
+permissions:
+  decapitation.setname:
+    description: Set the name of skulls
