@@ -2,11 +2,11 @@
 
     <modelVersion>4.0.0</modelVersion>
     <groupId>to.joe</groupId>
-    <artifactId>StrangeWeapons</artifactId>
-    <version>0.2.1</version>
-    <name>StrangeWeapons</name>
+    <artifactId>Decapitation</artifactId>
+    <version>0.1-SNAPSHOT</version>
+    <name>Decapitation</name>
     <url>http://joe.to</url>
-    <description>Strange weapons</description>
+    <description>Drops heads on death</description>
     
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>

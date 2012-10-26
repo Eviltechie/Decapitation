@@ -1,1 +1,3 @@
-skullsOnAllDeaths: false
+dropSkulls:
+  allDeaths: false
+  killedByPlayer: true
