@@ -8,7 +8,7 @@ commands:
     description: Sets the name of a skull
     permission: decapitation.setname
     permission-message: Who do you think you are?
-    usage: /<command> playername
+    usage: /<command> [playername]
 permissions:
   decapitation.setname:
     description: Set the name of skulls

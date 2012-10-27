@@ -24,7 +24,7 @@ public class Decapitation extends JavaPlugin implements Listener {
     @EventHandler
     public void onDeath(PlayerDeathEvent event) {
         if (allDeaths || (killedByPlayer && event.getEntity().getKiller() != null)) {
-            CraftItemStack c = new CraftItemStack(98, 1, (short) 0, (byte) 3); //XXX Set 397 here
+            CraftItemStack c = new CraftItemStack(397, 1, (short) 0, (byte) 3); //XXX Set 397 here
             new Head(c).setName(event.getEntity().getName());
             event.getDrops().add(c);
         }
