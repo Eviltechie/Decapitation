@@ -20,7 +20,8 @@ permissions:
     description: Set the name of skulls
   decapitation.spawnhead:
     description: Spawn heads with a given name
-    children: decapitation.setname
+    children:
+      decapitation.setname: true
   decapitation.dropheads:
     description: Ability to drop heads on death
     default: true
