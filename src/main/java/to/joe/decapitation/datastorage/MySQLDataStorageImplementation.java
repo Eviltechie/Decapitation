@@ -1,6 +1,7 @@
 package to.joe.decapitation.datastorage;
 
 import java.sql.Connection;
+import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -18,6 +19,7 @@ public class MySQLDataStorageImplementation implements DataStorageInterface {
 
     public MySQLDataStorageImplementation(Decapitation decapitation, String url, String username, String password) throws SQLException {
         plugin = decapitation;
+        connection = DriverManager.getConnection(url, username, password);
     }
     
     private PreparedStatement getFreshPreparedStatementColdFromTheRefrigerator(String query) throws SQLException {
