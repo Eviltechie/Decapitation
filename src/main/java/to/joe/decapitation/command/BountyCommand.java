@@ -25,29 +25,29 @@ public class BountyCommand implements CommandExecutor {
     public BountyCommand(Decapitation decapitation) {
         plugin = decapitation;
     }
+    
+    private void sendHelp(CommandSender sender) {
+        sender.sendMessage(ChatColor.RED + "/bounty search [username] - search for a bounty on a player");
+        sender.sendMessage(ChatColor.RED + "/bounty list <page> - list current bounties");
+        sender.sendMessage(ChatColor.RED + "/bounty place [username] [price] - place a bounty on a player");
+        sender.sendMessage(ChatColor.RED + "/bounty claim - claim the bounty of the head you are holding");
+        sender.sendMessage(ChatColor.RED + "/bounty remove [username] - remove the bounty of a player");
+        sender.sendMessage(ChatColor.RED + "/bounty listown - list unclaimed bounties you have created");
+        sender.sendMessage(ChatColor.RED + "/bounty redeem - claim any heads that are owed to you");
+        sender.sendMessage(ChatColor.RED + "Current tax rate is " + plugin.getTax() + "%");
+    }
 
-    public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) { //TODO Perms, checking return statements, are bounties enabled?
-        /*
-         * bounty search [username]
-         * bounty list <page>
-         * bounty place [username] [price]
-         * bounty claim
-         * bounty remove [username]
-         * bounty listown
-         */
+    public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
         if (!(sender instanceof Player)) {
             sender.sendMessage(ChatColor.RED + "Players only");
             return true;
         }
+        if (!plugin.bounties) {
+            sender.sendMessage(ChatColor.RED + "Bounties are not enabled");
+            return true;
+        }
         if (args.length == 0) {
-            sender.sendMessage(ChatColor.RED + "/bounty search [username] - search for a bounty on a player");
-            sender.sendMessage(ChatColor.RED + "/bounty list <page> - list current bounties");
-            sender.sendMessage(ChatColor.RED + "/bounty place [username] [price] - place a bounty on a player");
-            sender.sendMessage(ChatColor.RED + "/bounty claim - claim the bounty of the head you are holding");
-            sender.sendMessage(ChatColor.RED + "/bounty remove [username] - remove the bounty of a player");
-            sender.sendMessage(ChatColor.RED + "/bounty listown - list unclaimed bounties you have created");
-            sender.sendMessage(ChatColor.RED + "/bounty redeem - claim any heads that are owed to you");
-            sender.sendMessage(ChatColor.RED + "Current tax rate is " + plugin.getTax() + "%");
+            sendHelp(sender);
             return true;
         }
         Player p = (Player) sender;
@@ -88,6 +88,7 @@ public class BountyCommand implements CommandExecutor {
                         b.setTurnedIn(new Timestamp(new Date().getTime()));
                         plugin.getDsi().updateBounty(b);
                         Decapitation.economy.depositPlayer(p.getName(), b.getReward());
+                        sender.sendMessage(ChatColor.GREEN + "Sucessfully turned in bounty on " + b.getHunted() + " for " + Decapitation.economy.format(b.getReward()));
                         p.setItemInHand(new ItemStack(0));
                         Player i = plugin.getServer().getPlayer(b.getIssuer());
                         if (i != null) {
@@ -106,6 +107,7 @@ public class BountyCommand implements CommandExecutor {
                     sender.sendMessage(ChatColor.RED + "Something went wrong :(");
                     return true;
                 }
+                return true;
             }
             if (args[0].equalsIgnoreCase("listown")) {
                 try {
@@ -116,7 +118,7 @@ public class BountyCommand implements CommandExecutor {
                             sender.sendMessage(ChatColor.GOLD + "" + b.getReward() + " - " + b.getHunted());
                         }
                     } else {
-                        sender.sendMessage(ChatColor.RED + "There are no bounties");
+                        sender.sendMessage(ChatColor.RED + "You have no bounties");
                     }
                 } catch (SQLException e) {
                     plugin.getLogger().log(Level.SEVERE, "Error getting list of bounties", e);
@@ -124,6 +126,24 @@ public class BountyCommand implements CommandExecutor {
                 }
                 return true;
             }
+            if (args[0].equalsIgnoreCase("redeem")) {
+                try {
+                    ArrayList<Bounty> bounties = plugin.getDsi().getUnclaimedBounties(p.getName());
+                    for (Bounty b : bounties) {
+                        CraftItemStack c = new CraftItemStack(Decapitation.HEAD, 1, (short) 0, (byte) 3);
+                        new Head(c).setName(b.getHunted());
+                        ((Player) sender).getInventory().addItem(c);
+                        b.setRedeemed(new Timestamp(new Date().getTime()));
+                        plugin.getDsi().updateBounty(b);
+                    }
+                } catch (SQLException e) {
+                    plugin.getLogger().log(Level.SEVERE, "Error getting list of unredeemed bounties", e);
+                    sender.sendMessage(ChatColor.RED + "Something went wrong :(");
+                }
+                return true;
+            }
+            sendHelp(sender);
+            return true;
         }
         if (args.length == 2) {
             if (args[0].equalsIgnoreCase("search")) {
@@ -146,6 +166,7 @@ public class BountyCommand implements CommandExecutor {
                     sender.sendMessage(ChatColor.RED + "Something went wrong :(");
                     return true;
                 }
+                return true;
             }
             if (args[0].equalsIgnoreCase("list")) {
                 try {
@@ -172,7 +193,9 @@ public class BountyCommand implements CommandExecutor {
                     Bounty bounty = plugin.getDsi().getBounty(args[1], p.getName());
                     if (bounty != null) {
                         plugin.getDsi().deleteBounty(bounty);
-                        sender.sendMessage(ChatColor.GREEN + "Deleted bounty");
+                        Decapitation.economy.depositPlayer(p.getName(), bounty.getReward() - bounty.getReward() * plugin.getTax());
+                        sender.sendMessage(ChatColor.GREEN + "Deleted bounty against " + bounty.getHunted() + " for " + Decapitation.economy.format(bounty.getReward()));
+                        sender.sendMessage(ChatColor.GREEN + "You have been refunded " + Decapitation.economy.format(bounty.getReward() - bounty.getReward() * plugin.getTax()));
                     } else {
                         sender.sendMessage(ChatColor.RED + "No matches");
                     }
@@ -180,7 +203,10 @@ public class BountyCommand implements CommandExecutor {
                     plugin.getLogger().log(Level.SEVERE, "Error deleting bounty", e);
                     sender.sendMessage(ChatColor.RED + "Something went wrong :(");
                 }
+                return true;
             }
+            sendHelp(sender);
+            return true;
         }
         if (args.length == 3 && args[0].equalsIgnoreCase("place")) {
             try {
@@ -192,12 +218,16 @@ public class BountyCommand implements CommandExecutor {
                         plugin.getDsi().addBounty(bounty);
                         Decapitation.economy.withdrawPlayer(p.getName(), reward + reward * plugin.getTax());
                         sender.sendMessage(ChatColor.GREEN + "Added bounty against " + args[1]);
+                        sender.sendMessage(ChatColor.GREEN + "You have been charged " + Decapitation.economy.format(reward + reward * plugin.getTax()));
                     } else {
                         bounty.setReward(bounty.getReward() + reward);
                         plugin.getDsi().updateBounty(bounty);
                         Decapitation.economy.withdrawPlayer(p.getName(), reward + reward * plugin.getTax());
                         sender.sendMessage(ChatColor.GREEN + "Added money to existing bounty against " + args[1]);
+                        sender.sendMessage(ChatColor.GREEN + "You have been charged " + Decapitation.economy.format(reward + reward * plugin.getTax()));
                     }
+                } else {
+                    sender.sendMessage(ChatColor.RED + "You don't have enough money (" + Decapitation.economy.format(reward + reward * plugin.getTax()) + ")");
                 }
             } catch (NumberFormatException e) {
                 sender.sendMessage(ChatColor.RED + "That's not a number");
@@ -206,6 +236,7 @@ public class BountyCommand implements CommandExecutor {
                 sender.sendMessage(ChatColor.RED + "Something went wrong :(");
             }
         }
+        sendHelp(sender);
         return true;
     }
 

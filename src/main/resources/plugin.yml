@@ -16,7 +16,9 @@ commands:
     permission-message: You may not spawn heads
     usage: /<command> [playername] <quantity>
   bounty:
-    description: Bounty fun
+    description: Place, claim, and search bounties bounties
+    permission: decapitation.bounty
+    permission-message: You may not use bounties
     usage: /<command>
 permissions:
   decapitation.setname:
@@ -31,3 +33,5 @@ permissions:
   decapitation.collectheads:
     description: Ability to collect heads when killing another player
     default: true
+  decapitation.bounty:
+    description: Place, claim, and search bounties bounties

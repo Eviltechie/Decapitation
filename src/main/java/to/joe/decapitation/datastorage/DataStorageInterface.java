@@ -16,6 +16,24 @@ public interface DataStorageInterface {
     public int getNumBounties() throws SQLException;
 
     /**
+     * Gets the number of unclaimed heads an issuer has
+     * 
+     * @param issuer
+     * @return
+     * @throws SQLException
+     */
+    public int getNumUnclaimedHeads(String issuer) throws SQLException;
+
+    /**
+     * Gets a list of bounties that are unclaimed by the issuer
+     * 
+     * @param issuer
+     * @return
+     * @throws SQLException
+     */
+    public ArrayList<Bounty> getUnclaimedBounties(String issuer) throws SQLException;
+
+    /**
      * Gets uncollected bounties sorted by highest reward limiting between min and max
      * 
      * @param min

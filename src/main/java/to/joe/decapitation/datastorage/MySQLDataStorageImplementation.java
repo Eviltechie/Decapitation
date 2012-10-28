@@ -34,6 +34,7 @@ public class MySQLDataStorageImplementation implements DataStorageInterface {
     public int getNumBounties() throws SQLException {
         PreparedStatement ps = getFreshPreparedStatementColdFromTheRefrigerator("SELECT count(*) FROM bounties WHERE hunter IS NULL");
         ResultSet rs = ps.executeQuery();
+        rs.next();
         return rs.getInt(1);
     }
 
@@ -68,6 +69,7 @@ public class MySQLDataStorageImplementation implements DataStorageInterface {
         ps.setDouble(3, bounty.getReward());
         ps.execute();
         ResultSet rs = ps.getGeneratedKeys();
+        rs.next();
         ps = getFreshPreparedStatementColdFromTheRefrigerator("SELECT * FROM bounties WHERE id = ?");
         ps.setInt(1, rs.getInt(1));
         rs = ps.executeQuery();
@@ -77,7 +79,7 @@ public class MySQLDataStorageImplementation implements DataStorageInterface {
 
     @Override
     public void updateBounty(Bounty bounty) throws SQLException {
-        PreparedStatement ps = getFreshPreparedStatementColdFromTheRefrigerator("UPDATE bounties SET issuer = ?, hunted = ?, reward = ?, created = ?, hunter = ?, turnedin = ? redeemed = ?");
+        PreparedStatement ps = getFreshPreparedStatementColdFromTheRefrigerator("UPDATE bounties SET issuer = ?, hunted = ?, reward = ?, created = ?, hunter = ?, turnedin = ?, redeemed = ? WHERE id = ?");
         ps.setString(1, bounty.getIssuer());
         ps.setString(2, bounty.getHunted());
         ps.setDouble(3, bounty.getReward());
@@ -96,6 +98,7 @@ public class MySQLDataStorageImplementation implements DataStorageInterface {
             ps.setNull(7, Types.TIMESTAMP);
         else
             ps.setTimestamp(7, bounty.getRedeemed());
+        ps.setInt(8, bounty.getID());
 
         ps.execute();
     }
@@ -142,6 +145,28 @@ public class MySQLDataStorageImplementation implements DataStorageInterface {
             bounties.add(new Bounty(rs.getInt(1), rs.getString(2), rs.getString(3), rs.getDouble(4), rs.getTimestamp(5), rs.getString(6), rs.getTimestamp(7), rs.getTimestamp(8)));
         }
         return bounties;
+    }
+
+    @Override
+    public int getNumUnclaimedHeads(String issuer) throws SQLException {
+        PreparedStatement ps = getFreshPreparedStatementColdFromTheRefrigerator("SELECT count(*) FROM bounties WHERE issuer LIKE ? AND turnedin IS NOT NULL AND redeemed IS NULL");
+        ps.setString(1, issuer);
+        ResultSet rs = ps.executeQuery();
+        rs.next();
+        return rs.getInt(1);
+    }
+
+    @Override
+    public ArrayList<Bounty> getUnclaimedBounties(String issuer) throws SQLException {
+        // TODO Auto-generated method stub
+        PreparedStatement ps = getFreshPreparedStatementColdFromTheRefrigerator("SELECT * FROM bounties WHERE issuer LIKE ? AND turnedin IS NOT NULL AND redeemed IS NULL");
+        ps.setString(1, issuer);
+        ResultSet rs = ps.executeQuery();
+        ArrayList<Bounty> bounties = new ArrayList<Bounty>();
+        while (rs.next()) {
+            bounties.add(new Bounty(rs.getInt(1), rs.getString(2), rs.getString(3), rs.getDouble(4), rs.getTimestamp(5), rs.getString(6), rs.getTimestamp(7), rs.getTimestamp(8)));
+        }
+        return null;
     }
 
 }

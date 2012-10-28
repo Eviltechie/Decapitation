@@ -5,13 +5,15 @@ import java.util.logging.Level;
 
 import net.milkbowl.vault.economy.Economy;
 
-import org.bukkit.block.Block;
+import org.bukkit.ChatColor;
 import org.bukkit.craftbukkit.inventory.CraftItemStack;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
+import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -27,7 +29,7 @@ public class Decapitation extends JavaPlugin implements Listener {
     public static final int HEADBLOCK = 144;
     double allDeaths;
     double killedByPlayer;
-    boolean bounties = false;
+    public boolean bounties = false;
     private double tax;
     private DataStorageInterface dsi;
 
@@ -69,7 +71,7 @@ public class Decapitation extends JavaPlugin implements Listener {
         }
         if (bounties) {
             try {
-                dsi = new MySQLDataStorageImplementation(this, getConfig().getString("mysql.url"), getConfig().getString("mysql.username"), getConfig().getString("mysql.password"));
+                dsi = new MySQLDataStorageImplementation(this, getConfig().getString("database.url"), getConfig().getString("database.username"), getConfig().getString("database.password"));
             } catch (SQLException e) {
                 getLogger().log(Level.SEVERE, "Error connecting to mysql database", e);
                 bounties = false;
@@ -81,19 +83,19 @@ public class Decapitation extends JavaPlugin implements Listener {
             getLogger().info("Bounties not enabled");
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.HIGHEST)
     public void onBreak(BlockBreakEvent event) {
-        if (!event.isCancelled() && event.getBlock().getTypeId() == HEADBLOCK && event.getBlock().getData() == 3) {
-            Head oldHead = new Head((CraftItemStack) event.getBlock());
-            if (oldHead.isNamed()) {
-                String name = oldHead.getName();
-                CraftItemStack c = new CraftItemStack(HEAD, 1, (short) 0, (byte) 3);
-                new Head(c).setName(name);
-                event.setCancelled(true);
-                Block b = event.getBlock();
-                b.setTypeId(0);
-                b.getWorld().dropItemNaturally(b.getLocation(), c);
-            }
+        if (!event.isCancelled() && event.getBlock().getTypeId() == HEADBLOCK) {
+            String name = new Head(new CraftItemStack(HEAD, 1, (short) 0, (byte) 3), event.getBlock().getLocation()).getName();
+            if (name.equals(""))
+                return;
+            Head h = null;
+            CraftItemStack head = new CraftItemStack(HEAD, 1, (short) 0, (byte) 3);
+            head = (CraftItemStack) event.getBlock().getWorld().dropItem(event.getBlock().getLocation(), head).getItemStack();
+            h = new Head(head);
+            h.setName(name);
+            event.getBlock().setTypeId(0);
+            event.setCancelled(true);
         }
     }
 
@@ -108,4 +110,22 @@ public class Decapitation extends JavaPlugin implements Listener {
         }
     }
 
+    @EventHandler
+    public void onPlayerJoin(PlayerJoinEvent event) {
+        if (bounties) {
+            int unclaimedHeads = 0;
+            try {
+                unclaimedHeads = dsi.getNumUnclaimedHeads(event.getPlayer().getName());
+            } catch (SQLException e) {
+                getLogger().log(Level.SEVERE, "Error getting number of unclaimed heads", e);
+            }
+            if (unclaimedHeads > 0) {
+                if (unclaimedHeads == 1)
+                    event.getPlayer().sendMessage(ChatColor.GOLD + "You have " + unclaimedHeads + " unclaimed head.");
+                else
+                    event.getPlayer().sendMessage(ChatColor.GOLD + "You have " + unclaimedHeads + " unclaimed heads.");
+                event.getPlayer().sendMessage(ChatColor.GOLD + "Type /bounty redeem to receive them");
+            }
+        }
+    }
 }
