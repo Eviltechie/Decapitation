@@ -26,7 +26,7 @@ public class BountyCommand implements CommandExecutor {
         plugin = decapitation;
     }
 
-    public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) { //TODO Perms, checking return statements
+    public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) { //TODO Perms, checking return statements, are bounties enabled?
         /*
          * bounty search [username]
          * bounty list <page>

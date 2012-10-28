@@ -19,6 +19,7 @@ import to.joe.decapitation.command.BountyCommand;
 import to.joe.decapitation.command.SetNameCommand;
 import to.joe.decapitation.command.SpawnHeadCommand;
 import to.joe.decapitation.datastorage.DataStorageInterface;
+import to.joe.decapitation.datastorage.MySQLDataStorageImplementation;
 
 public class Decapitation extends JavaPlugin implements Listener {
 
@@ -28,7 +29,6 @@ public class Decapitation extends JavaPlugin implements Listener {
     double killedByPlayer;
     boolean bounties = false;
     private double tax;
-    MySQL sql;
     private DataStorageInterface dsi;
 
     public static Economy economy = null;
@@ -39,10 +39,6 @@ public class Decapitation extends JavaPlugin implements Listener {
             economy = economyProvider.getProvider();
         }
         return (economy != null);
-    }
-
-    public MySQL getSQL() {
-        return sql;
     }
 
     public DataStorageInterface getDsi() {
@@ -68,7 +64,7 @@ public class Decapitation extends JavaPlugin implements Listener {
             bounties = setupEconomy();
         if (bounties) {
             try {
-                sql = new MySQL(getConfig().getString("mysql.url"), getConfig().getString("mysql.username"), getConfig().getString("mysql.password"));
+                dsi = new MySQLDataStorageImplementation(this, getConfig().getString("mysql.url"), getConfig().getString("mysql.username"), getConfig().getString("mysql.password"));
             } catch (SQLException e) {
                 getLogger().log(Level.SEVERE, "Error connecting to mysql database", e);
                 bounties = false;

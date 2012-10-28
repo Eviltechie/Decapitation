@@ -1,8 +1,10 @@
 package to.joe.decapitation.datastorage;
 
+import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.sql.Types;
 import java.util.ArrayList;
 
@@ -12,21 +14,30 @@ import to.joe.decapitation.Decapitation;
 public class MySQLDataStorageImplementation implements DataStorageInterface {
 
     Decapitation plugin;
+    private Connection connection;
 
-    public MySQLDataStorageImplementation(Decapitation decapitation) {
+    public MySQLDataStorageImplementation(Decapitation decapitation, String url, String username, String password) throws SQLException {
         plugin = decapitation;
+    }
+    
+    private PreparedStatement getFreshPreparedStatementColdFromTheRefrigerator(String query) throws SQLException {
+        return connection.prepareStatement(query);
+    }
+    
+    private PreparedStatement getFreshPreparedStatementWithGeneratedKeys(String query) throws SQLException {
+        return connection.prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
     }
 
     @Override
     public int getNumBounties() throws SQLException {
-        PreparedStatement ps = plugin.getSQL().getFreshPreparedStatementColdFromTheRefrigerator("SELECT count(*) FROM bounties WHERE hunter IS NULL");
+        PreparedStatement ps = getFreshPreparedStatementColdFromTheRefrigerator("SELECT count(*) FROM bounties WHERE hunter IS NULL");
         ResultSet rs = ps.executeQuery();
         return rs.getInt(1);
     }
 
     @Override
     public ArrayList<Bounty> getBounties(int min, int max) throws SQLException {
-        PreparedStatement ps = plugin.getSQL().getFreshPreparedStatementColdFromTheRefrigerator("SELECT * FROM bounties WHERE hunter IS NULL ORDER BY bounties.reward DESC LIMIT 0,9");
+        PreparedStatement ps = getFreshPreparedStatementColdFromTheRefrigerator("SELECT * FROM bounties WHERE hunter IS NULL ORDER BY bounties.reward DESC LIMIT 0,9");
         ResultSet rs = ps.executeQuery();
         ArrayList<Bounty> bounties = new ArrayList<Bounty>();
         while (rs.next()) {
@@ -37,7 +48,7 @@ public class MySQLDataStorageImplementation implements DataStorageInterface {
 
     @Override
     public Bounty getBounty(String hunted) throws SQLException {
-        PreparedStatement ps = plugin.getSQL().getFreshPreparedStatementColdFromTheRefrigerator("SELECT * FROM bounties WHERE hunted LIKE ? AND hunter IS NULL ORDER BY bounties.reward DESC LIMIT 1");
+        PreparedStatement ps = getFreshPreparedStatementColdFromTheRefrigerator("SELECT * FROM bounties WHERE hunted LIKE ? AND hunter IS NULL ORDER BY bounties.reward DESC LIMIT 1");
         ps.setString(1, hunted);
         ResultSet rs = ps.executeQuery();
         if (rs.next()) {
@@ -49,13 +60,13 @@ public class MySQLDataStorageImplementation implements DataStorageInterface {
 
     @Override
     public Bounty addBounty(Bounty bounty) throws SQLException {
-        PreparedStatement ps = plugin.getSQL().getFreshPreparedStatementWithGeneratedKeys("INSERT INTO bounties (issuer, hunted, reward) VALUES (?,?,?)");
+        PreparedStatement ps = getFreshPreparedStatementWithGeneratedKeys("INSERT INTO bounties (issuer, hunted, reward) VALUES (?,?,?)");
         ps.setString(1, bounty.getIssuer());
         ps.setString(2, bounty.getHunted());
         ps.setDouble(3, bounty.getReward());
         ps.execute();
         ResultSet rs = ps.getGeneratedKeys();
-        ps = plugin.getSQL().getFreshPreparedStatementColdFromTheRefrigerator("SELECT * FROM bounties WHERE id = ?");
+        ps = getFreshPreparedStatementColdFromTheRefrigerator("SELECT * FROM bounties WHERE id = ?");
         ps.setInt(1, rs.getInt(1));
         rs = ps.executeQuery();
         rs.next();
@@ -64,7 +75,7 @@ public class MySQLDataStorageImplementation implements DataStorageInterface {
 
     @Override
     public void updateBounty(Bounty bounty) throws SQLException {
-        PreparedStatement ps = plugin.getSQL().getFreshPreparedStatementColdFromTheRefrigerator("UPDATE bounties SET issuer = ?, hunted = ?, reward = ?, created = ?, hunter = ?, turnedin = ? redeemed = ?");
+        PreparedStatement ps = getFreshPreparedStatementColdFromTheRefrigerator("UPDATE bounties SET issuer = ?, hunted = ?, reward = ?, created = ?, hunter = ?, turnedin = ? redeemed = ?");
         ps.setString(1, bounty.getIssuer());
         ps.setString(2, bounty.getHunted());
         ps.setDouble(3, bounty.getReward());
@@ -89,14 +100,14 @@ public class MySQLDataStorageImplementation implements DataStorageInterface {
 
     @Override
     public void deleteBounty(Bounty bounty) throws SQLException {
-        PreparedStatement ps = plugin.getSQL().getFreshPreparedStatementColdFromTheRefrigerator("DELETE FROM bounties WHERE id = ?");
+        PreparedStatement ps = getFreshPreparedStatementColdFromTheRefrigerator("DELETE FROM bounties WHERE id = ?");
         ps.setInt(1, bounty.getID());
         ps.execute();
     }
 
     @Override
     public ArrayList<Bounty> getBounties(String hunted) throws SQLException {
-        PreparedStatement ps = plugin.getSQL().getFreshPreparedStatementColdFromTheRefrigerator("SELECT * FROM bounties WHERE hunted LIKE ? AND hunter IS NULL ORDER BY bounties.hunted ASC");
+        PreparedStatement ps = getFreshPreparedStatementColdFromTheRefrigerator("SELECT * FROM bounties WHERE hunted LIKE ? AND hunter IS NULL ORDER BY bounties.hunted ASC");
         ps.setString(1, "%" + hunted + "%");
         ResultSet rs = ps.executeQuery();
         ArrayList<Bounty> bounties = new ArrayList<Bounty>();
@@ -108,7 +119,7 @@ public class MySQLDataStorageImplementation implements DataStorageInterface {
 
     @Override
     public Bounty getBounty(String hunted, String issuer) throws SQLException {
-        PreparedStatement ps = plugin.getSQL().getFreshPreparedStatementColdFromTheRefrigerator("SELECT * FROM bounties WHERE hunted LIKE ? AND ISSUER LIKE ? AND hunter IS NULL ORDER BY bounties.reward DESC LIMIT 1");
+        PreparedStatement ps = getFreshPreparedStatementColdFromTheRefrigerator("SELECT * FROM bounties WHERE hunted LIKE ? AND ISSUER LIKE ? AND hunter IS NULL ORDER BY bounties.reward DESC LIMIT 1");
         ps.setString(1, hunted);
         ps.setString(2, issuer);
         ResultSet rs = ps.executeQuery();
@@ -121,7 +132,7 @@ public class MySQLDataStorageImplementation implements DataStorageInterface {
 
     @Override
     public ArrayList<Bounty> getOwnBounties(String issuer) throws SQLException {
-        PreparedStatement ps = plugin.getSQL().getFreshPreparedStatementColdFromTheRefrigerator("SELECT * FROM bounties WHERE issuer LIKE ? AND hunter IS NULL ORDER BY bounties.reward DESC");
+        PreparedStatement ps = getFreshPreparedStatementColdFromTheRefrigerator("SELECT * FROM bounties WHERE issuer LIKE ? AND hunter IS NULL ORDER BY bounties.reward DESC");
         ps.setString(1, issuer);
         ResultSet rs = ps.executeQuery();
         ArrayList<Bounty> bounties = new ArrayList<Bounty>();
