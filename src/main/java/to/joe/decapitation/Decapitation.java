@@ -60,8 +60,13 @@ public class Decapitation extends JavaPlugin implements Listener {
         getCommand("setname").setExecutor(new SetNameCommand());
         getCommand("spawnhead").setExecutor(new SpawnHeadCommand());
         getCommand("bounty").setExecutor(new BountyCommand(this));
-        if (getConfig().getBoolean("bounties.enabled"))
+        if (getConfig().getBoolean("bounties.enabled")) {
             bounties = setupEconomy();
+            if (bounties)
+                getLogger().info("Econ detected");
+            else
+                getLogger().info("Econ not detected");
+        }
         if (bounties) {
             try {
                 dsi = new MySQLDataStorageImplementation(this, getConfig().getString("mysql.url"), getConfig().getString("mysql.username"), getConfig().getString("mysql.password"));
