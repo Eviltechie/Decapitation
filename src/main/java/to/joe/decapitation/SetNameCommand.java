@@ -26,8 +26,8 @@ public class SetNameCommand implements CommandExecutor {
             return true;
         }
         Player player = (Player) sender;
-        if (player.getItemInHand().getTypeId() == 397) { //XXX Set 397 here
-            player.setItemInHand(new ItemStack(397, player.getItemInHand().getAmount(), (short) 0, (byte) 3)); //XXX Set 397 here
+        if (player.getItemInHand().getTypeId() == Decapitation.HEAD) {
+            player.setItemInHand(new ItemStack(Decapitation.HEAD, player.getItemInHand().getAmount(), (short) 0, (byte) 3));
             player.updateInventory();
             new Head((CraftItemStack) player.getItemInHand()).setName(args[0]);
             sender.sendMessage(ChatColor.GREEN + "Set name " + args[0]);

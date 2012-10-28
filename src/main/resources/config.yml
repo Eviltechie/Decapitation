@@ -1,3 +1,10 @@
 dropSkulls:
-  allDeaths: false
-  killedByPlayer: true
+  allDeaths: 0
+  killedByPlayer: 1
+bounty:
+  enabled: false
+  tax: .05
+database:
+  url: jdbc:mysql://localhost:3306/database
+  username: minecraft
+  password: lolololol

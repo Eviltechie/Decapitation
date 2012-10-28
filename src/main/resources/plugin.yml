@@ -3,12 +3,27 @@ version: '${project.version}'
 author: Eviltechie
 website: http://joe.to
 main: to.joe.decapitation.Decapitation
+softdepend: [Vault]
 commands:
   setname:
     description: Sets the name of a skull
     permission: decapitation.setname
-    permission-message: Who do you think you are?
+    permission-message: You may not set head names
     usage: /<command> [playername]
+  spawnhead:
+    description: Spawns a player head with the given name
+    permission: decapitation.spawnhead
+    permission-message: You may not spawn heads
+    usage: /<command> [playername] <quantity>
 permissions:
   decapitation.setname:
     description: Set the name of skulls
+  decapitation.spawnhead:
+    description: Spawn heads with a given name
+    children: decapitation.setname
+  decapitation.dropheads:
+    description: Ability to drop heads on death
+    default: true
+  decapitation.collectheads:
+    description: Ability to collect heads when killing another player
+    default: true
