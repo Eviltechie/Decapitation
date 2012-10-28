@@ -60,7 +60,7 @@ public class Decapitation extends JavaPlugin implements Listener {
         getCommand("setname").setExecutor(new SetNameCommand());
         getCommand("spawnhead").setExecutor(new SpawnHeadCommand());
         getCommand("bounty").setExecutor(new BountyCommand(this));
-        if (getConfig().getBoolean("bounties.enabled")) {
+        if (getConfig().getBoolean("bounty.enabled")) {
             bounties = setupEconomy();
             if (bounties)
                 getLogger().info("Econ detected");
