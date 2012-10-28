@@ -15,6 +15,9 @@ commands:
     permission: decapitation.spawnhead
     permission-message: You may not spawn heads
     usage: /<command> [playername] <quantity>
+  bounty:
+    description: Bounty fun
+    usage: /<command>
 permissions:
   decapitation.setname:
     description: Set the name of skulls

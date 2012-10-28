@@ -36,9 +36,10 @@ public interface DataStorageInterface {
      * @throws SQLException
      */
     public ArrayList<Bounty> getBounties(String hunted) throws SQLException;
-    
+
     /**
      * Gets a list of bounties sorted with the highest reward first
+     * 
      * @param issuer
      * @return
      * @throws SQLException
@@ -54,9 +55,10 @@ public interface DataStorageInterface {
      * @throws SQLException
      */
     public Bounty getBounty(String hunted) throws SQLException;
-    
+
     /**
      * Gets the bounty with the given name and owner
+     * 
      * @param hunted
      * @param issuer
      * @return

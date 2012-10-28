@@ -7,6 +7,7 @@ public class Bounty {
     private int ID;
     private String issuer;
     private String hunted;
+
     public void setID(int iD) {
         ID = iD;
     }
@@ -89,6 +90,5 @@ public class Bounty {
     public Timestamp getRedeemed() {
         return redeemed;
     }
-    
-    
+
 }

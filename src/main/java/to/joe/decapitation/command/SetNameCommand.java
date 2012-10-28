@@ -12,7 +12,7 @@ import to.joe.decapitation.Decapitation;
 import to.joe.decapitation.Head;
 
 public class SetNameCommand implements CommandExecutor {
-    
+
     @SuppressWarnings("deprecation")
     @Override
     public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {

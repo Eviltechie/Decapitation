@@ -40,11 +40,11 @@ public class Decapitation extends JavaPlugin implements Listener {
         }
         return (economy != null);
     }
-    
+
     public MySQL getSQL() {
         return sql;
     }
-    
+
     public DataStorageInterface getDsi() {
         return dsi;
     }

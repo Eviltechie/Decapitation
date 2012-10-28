@@ -10,9 +10,9 @@ import to.joe.decapitation.Bounty;
 import to.joe.decapitation.Decapitation;
 
 public class MySQLDataStorageImplementation implements DataStorageInterface {
-    
+
     Decapitation plugin;
-    
+
     public MySQLDataStorageImplementation(Decapitation decapitation) {
         plugin = decapitation;
     }
@@ -73,17 +73,17 @@ public class MySQLDataStorageImplementation implements DataStorageInterface {
             ps.setNull(5, Types.VARCHAR);
         else
             ps.setString(5, bounty.getHunter());
-        
+
         if (bounty.getTurnedIn() == null)
             ps.setNull(6, Types.TIMESTAMP);
         else
             ps.setTimestamp(6, bounty.getTurnedIn());
-        
+
         if (bounty.getRedeemed() == null)
             ps.setNull(7, Types.TIMESTAMP);
         else
             ps.setTimestamp(7, bounty.getRedeemed());
-        
+
         ps.execute();
     }
 
@@ -91,7 +91,7 @@ public class MySQLDataStorageImplementation implements DataStorageInterface {
     public void deleteBounty(Bounty bounty) throws SQLException {
         PreparedStatement ps = plugin.getSQL().getFreshPreparedStatementColdFromTheRefrigerator("DELETE FROM bounties WHERE id = ?");
         ps.setInt(1, bounty.getID());
-        ps.execute();   
+        ps.execute();
     }
 
     @Override
