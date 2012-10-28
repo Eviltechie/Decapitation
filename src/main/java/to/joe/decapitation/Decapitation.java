@@ -15,6 +15,11 @@ import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import to.joe.decapitation.command.BountyCommand;
+import to.joe.decapitation.command.SetNameCommand;
+import to.joe.decapitation.command.SpawnHeadCommand;
+import to.joe.decapitation.datastorage.DataStorageInterface;
+
 public class Decapitation extends JavaPlugin implements Listener {
 
     public static final int HEAD = 397;
@@ -22,8 +27,9 @@ public class Decapitation extends JavaPlugin implements Listener {
     double allDeaths;
     double killedByPlayer;
     boolean bounties = false;
-    double tax;
+    private double tax;
     MySQL sql;
+    private DataStorageInterface dsi;
 
     public static Economy economy = null;
 
@@ -33,6 +39,18 @@ public class Decapitation extends JavaPlugin implements Listener {
             economy = economyProvider.getProvider();
         }
         return (economy != null);
+    }
+    
+    public MySQL getSQL() {
+        return sql;
+    }
+    
+    public DataStorageInterface getDsi() {
+        return dsi;
+    }
+
+    public double getTax() {
+        return tax;
     }
 
     @Override

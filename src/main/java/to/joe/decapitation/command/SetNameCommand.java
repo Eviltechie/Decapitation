@@ -1,4 +1,4 @@
-package to.joe.decapitation;
+package to.joe.decapitation.command;
 
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
@@ -7,6 +7,9 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.craftbukkit.inventory.CraftItemStack;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+
+import to.joe.decapitation.Decapitation;
+import to.joe.decapitation.Head;
 
 public class SetNameCommand implements CommandExecutor {
     

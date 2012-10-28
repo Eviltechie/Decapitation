@@ -4,6 +4,7 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.sql.Statement;
 
 public class MySQL {
     
@@ -15,5 +16,9 @@ public class MySQL {
     
     public PreparedStatement getFreshPreparedStatementColdFromTheRefrigerator(String query) throws SQLException {
         return connection.prepareStatement(query);
+    }
+    
+    public PreparedStatement getFreshPreparedStatementWithGeneratedKeys(String query) throws SQLException {
+        return connection.prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
     }
 }
