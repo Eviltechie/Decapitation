@@ -24,7 +24,7 @@ public class YamlDataStorageImplementation implements DataStorageInterface {
     public YamlDataStorageImplementation (Decapitation plugin) throws IOException {
         this.plugin = plugin;
         
-        this.configFile = new File(plugin.getDataFolder() + "bounties.yml");
+        this.configFile = new File(plugin.getDataFolder() + File.pathSeparator + "bounties.yml");
         if (!(configFile.exists() && !configFile.isDirectory())) {
             configFile.createNewFile();
         }
@@ -284,7 +284,7 @@ public class YamlDataStorageImplementation implements DataStorageInterface {
         if (this.config.getConfigurationSection("bounties").getConfigurationSection(Integer.toString(bounty.getID())) == null) {
             throw new DataStorageException("Tried to delete a bounty whose id didn't exist!");
         }
-        this.config.set("bounties" + Integer.toString(bounty.getID()), null);
+        this.config.set("bounties." + Integer.toString(bounty.getID()), null);
         if (bounty.getID() == this.lastId) {
             lastId--;
         }
