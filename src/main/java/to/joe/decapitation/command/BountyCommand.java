@@ -1,9 +1,8 @@
 package to.joe.decapitation.command;
 
-import java.sql.SQLException;
 import java.sql.Timestamp;
-import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.logging.Level;
 
 import org.bukkit.ChatColor;
@@ -17,6 +16,7 @@ import org.bukkit.inventory.ItemStack;
 import to.joe.decapitation.Bounty;
 import to.joe.decapitation.Decapitation;
 import to.joe.decapitation.Head;
+import to.joe.decapitation.datastorage.DataStorageException;
 
 public class BountyCommand implements CommandExecutor {
 
@@ -54,7 +54,7 @@ public class BountyCommand implements CommandExecutor {
         if (args.length == 1) {
             if (args[0].equalsIgnoreCase("list")) {
                 try {
-                    ArrayList<Bounty> bounties = plugin.getDsi().getBounties(0, 9);
+                    List<Bounty> bounties = plugin.getDsi().getBounties(0, 9);
                     if (bounties.size() > 0) {
                         sender.sendMessage(ChatColor.GREEN + "=========" + ChatColor.GOLD + "Bounties [Page 1 of " + (plugin.getDsi().getNumBounties() + 8) / 9 + "]" + ChatColor.GREEN + "=========");
                         for (Bounty b : bounties) {
@@ -63,7 +63,7 @@ public class BountyCommand implements CommandExecutor {
                     } else {
                         sender.sendMessage(ChatColor.RED + "There are no bounties");
                     }
-                } catch (SQLException e) {
+                } catch (DataStorageException e) {
                     plugin.getLogger().log(Level.SEVERE, "Error getting list of bounties", e);
                     sender.sendMessage(ChatColor.RED + "Something went wrong :(");
                 }
@@ -107,7 +107,7 @@ public class BountyCommand implements CommandExecutor {
                         sender.sendMessage(ChatColor.RED + "There does not appear to be a bounty on that head");
                         return true;
                     }
-                } catch (SQLException e) {
+                } catch (DataStorageException e) {
                     plugin.getLogger().log(Level.SEVERE, "Error claiming bounty", e);
                     sender.sendMessage(ChatColor.RED + "Something went wrong :(");
                     return true;
@@ -116,7 +116,7 @@ public class BountyCommand implements CommandExecutor {
             }
             if (args[0].equalsIgnoreCase("listown")) {
                 try {
-                    ArrayList<Bounty> bounties = plugin.getDsi().getOwnBounties(p.getName());
+                    List<Bounty> bounties = plugin.getDsi().getOwnBounties(p.getName());
                     if (bounties.size() > 0) {
                         sender.sendMessage(ChatColor.GREEN + "=========" + ChatColor.GOLD + "Your bounties" + ChatColor.GREEN + "=========");
                         for (Bounty b : bounties) {
@@ -125,7 +125,7 @@ public class BountyCommand implements CommandExecutor {
                     } else {
                         sender.sendMessage(ChatColor.RED + "You have no bounties");
                     }
-                } catch (SQLException e) {
+                } catch (DataStorageException e) {
                     plugin.getLogger().log(Level.SEVERE, "Error getting list of bounties", e);
                     sender.sendMessage(ChatColor.RED + "Something went wrong :(");
                 }
@@ -133,7 +133,7 @@ public class BountyCommand implements CommandExecutor {
             }
             if (args[0].equalsIgnoreCase("redeem")) {
                 try {
-                    ArrayList<Bounty> bounties = plugin.getDsi().getUnclaimedBounties(p.getName());
+                    List<Bounty> bounties = plugin.getDsi().getUnclaimedBounties(p.getName());
                     for (Bounty b : bounties) {
                         CraftItemStack c = new CraftItemStack(Decapitation.HEAD, 1, (short) 0, (byte) 3);
                         new Head(c).setName(b.getHunted());
@@ -146,7 +146,7 @@ public class BountyCommand implements CommandExecutor {
                         b.setRedeemed(new Timestamp(new Date().getTime()));
                         plugin.getDsi().updateBounty(b);
                     }
-                } catch (SQLException e) {
+                } catch (DataStorageException e) {
                     plugin.getLogger().log(Level.SEVERE, "Error getting list of unredeemed bounties", e);
                     sender.sendMessage(ChatColor.RED + "Something went wrong :(");
                 }
@@ -158,7 +158,7 @@ public class BountyCommand implements CommandExecutor {
         if (args.length == 2) {
             if (args[0].equalsIgnoreCase("search")) {
                 try {
-                    ArrayList<Bounty> bounties = plugin.getDsi().getBounties(args[1]);
+                    List<Bounty> bounties = plugin.getDsi().getBounties(args[1]);
                     int count = 0;
                     if (bounties.size() > 0) {
                         sender.sendMessage(ChatColor.GREEN + "=========" + ChatColor.GOLD + "Bounties matching " + args[1] + " " + ChatColor.GREEN + "=========");
@@ -171,7 +171,7 @@ public class BountyCommand implements CommandExecutor {
                     } else {
                         sender.sendMessage(ChatColor.RED + "No bounties match your query");
                     }
-                } catch (SQLException e) {
+                } catch (DataStorageException e) {
                     plugin.getLogger().log(Level.SEVERE, "Error searching for bounties", e);
                     sender.sendMessage(ChatColor.RED + "Something went wrong :(");
                     return true;
@@ -181,7 +181,7 @@ public class BountyCommand implements CommandExecutor {
             if (args[0].equalsIgnoreCase("list")) {
                 try {
                     int page = Integer.parseInt(args[1]);
-                    ArrayList<Bounty> bounties = plugin.getDsi().getBounties((page - 1) * 9, page * 9);
+                    List<Bounty> bounties = plugin.getDsi().getBounties((page - 1) * 9, page * 9);
                     if (bounties.size() > 0) {
                         sender.sendMessage(ChatColor.GREEN + "=========" + ChatColor.GOLD + "Bounties [Page 1 of " + (plugin.getDsi().getNumBounties() + 8) / 9 + "]" + ChatColor.GREEN + "=========");
                         for (Bounty b : bounties) {
@@ -192,7 +192,7 @@ public class BountyCommand implements CommandExecutor {
                     }
                 } catch (NumberFormatException e) {
                     sender.sendMessage(ChatColor.RED + "That's not a number");
-                } catch (SQLException e) {
+                } catch (DataStorageException e) {
                     plugin.getLogger().log(Level.SEVERE, "Error getting list of bounties", e);
                     sender.sendMessage(ChatColor.RED + "Something went wrong :(");
                 }
@@ -213,7 +213,7 @@ public class BountyCommand implements CommandExecutor {
                     } else {
                         sender.sendMessage(ChatColor.RED + "No matches");
                     }
-                } catch (SQLException e) {
+                } catch (DataStorageException e) {
                     plugin.getLogger().log(Level.SEVERE, "Error deleting bounty", e);
                     sender.sendMessage(ChatColor.RED + "Something went wrong :(");
                 }
@@ -249,7 +249,7 @@ public class BountyCommand implements CommandExecutor {
                 }
             } catch (NumberFormatException e) {
                 sender.sendMessage(ChatColor.RED + "That's not a number");
-            } catch (SQLException e) {
+            } catch (DataStorageException e) {
                 plugin.getLogger().log(Level.SEVERE, "Error adding bounty", e);
                 sender.sendMessage(ChatColor.RED + "Something went wrong :(");
             }

@@ -26,6 +26,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 import to.joe.decapitation.command.BountyCommand;
 import to.joe.decapitation.command.SetNameCommand;
 import to.joe.decapitation.command.SpawnHeadCommand;
+import to.joe.decapitation.datastorage.DataStorageException;
 import to.joe.decapitation.datastorage.DataStorageInterface;
 import to.joe.decapitation.datastorage.MySQLDataStorageImplementation;
 
@@ -143,7 +144,7 @@ public class Decapitation extends JavaPlugin implements Listener {
             int unclaimedHeads = 0;
             try {
                 unclaimedHeads = dsi.getNumUnclaimedHeads(event.getPlayer().getName());
-            } catch (SQLException e) {
+            } catch (DataStorageException e) {
                 getLogger().log(Level.SEVERE, "Error getting number of unclaimed heads", e);
             }
             if (unclaimedHeads > 0) {

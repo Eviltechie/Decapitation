@@ -1,7 +1,6 @@
 package to.joe.decapitation.datastorage;
 
-import java.sql.SQLException;
-import java.util.ArrayList;
+import java.util.List;
 
 import to.joe.decapitation.Bounty;
 
@@ -11,27 +10,27 @@ public interface DataStorageInterface {
      * Gets the number of uncollected bounties
      * 
      * @return The number of uncollected bounties
-     * @throws SQLException
+     * @throws DataStorageException
      */
-    public int getNumBounties() throws SQLException;
+    public int getNumBounties() throws DataStorageException;
 
     /**
      * Gets the number of unclaimed heads an issuer has
      * 
      * @param issuer
      * @return
-     * @throws SQLException
+     * @throws DataStorageException
      */
-    public int getNumUnclaimedHeads(String issuer) throws SQLException;
+    public int getNumUnclaimedHeads(String issuer) throws DataStorageException;
 
     /**
      * Gets a list of bounties that are unclaimed by the issuer
      * 
      * @param issuer
      * @return
-     * @throws SQLException
+     * @throws DataStorageException
      */
-    public ArrayList<Bounty> getUnclaimedBounties(String issuer) throws SQLException;
+    public List<Bounty> getUnclaimedBounties(String issuer) throws DataStorageException;
 
     /**
      * Gets uncollected bounties sorted by highest reward limiting between min and max
@@ -41,9 +40,9 @@ public interface DataStorageInterface {
      * @param max
      *            The ending result
      * @return Bounties limited between min and max
-     * @throws SQLException
+     * @throws DataStorageException
      */
-    public ArrayList<Bounty> getBounties(int min, int max) throws SQLException;
+    public List<Bounty> getBounties(int min, int max) throws DataStorageException;
 
     /**
      * Gets a list of uncollected bounties that match the specified name sorted A-Z
@@ -51,18 +50,18 @@ public interface DataStorageInterface {
      * @param hunted
      *            Name to search for
      * @return Bounties that match the name
-     * @throws SQLException
+     * @throws DataStorageException
      */
-    public ArrayList<Bounty> getBounties(String hunted) throws SQLException;
+    public List<Bounty> getBounties(String hunted) throws DataStorageException;
 
     /**
      * Gets a list of bounties sorted with the highest reward first
      * 
      * @param issuer
      * @return
-     * @throws SQLException
+     * @throws DataStorageException
      */
-    public ArrayList<Bounty> getOwnBounties(String issuer) throws SQLException;
+    public List<Bounty> getOwnBounties(String issuer) throws DataStorageException;
 
     /**
      * Gets the bounty with the highest reward with the specified name
@@ -70,9 +69,9 @@ public interface DataStorageInterface {
      * @param name
      *            The name to search for
      * @return The highest bounty with the specified name, null if no match
-     * @throws SQLException
+     * @throws DataStorageException
      */
-    public Bounty getBounty(String hunted) throws SQLException;
+    public Bounty getBounty(String hunted) throws DataStorageException;
 
     /**
      * Gets the bounty with the given name and owner
@@ -80,9 +79,9 @@ public interface DataStorageInterface {
      * @param hunted
      * @param issuer
      * @return
-     * @throws SQLException
+     * @throws DataStorageException
      */
-    public Bounty getBounty(String hunted, String issuer) throws SQLException;
+    public Bounty getBounty(String hunted, String issuer) throws DataStorageException;
 
     /**
      * Adds the specified bounty to the database
@@ -90,26 +89,26 @@ public interface DataStorageInterface {
      * @param bounty
      *            The bounty to add
      * @return The newly added bounty
-     * @throws SQLException
+     * @throws DataStorageException
      */
-    public Bounty addBounty(Bounty bounty) throws SQLException;
+    public Bounty addBounty(Bounty bounty) throws DataStorageException;
 
     /**
      * Updates the specified bounty in the database
      * 
      * @param bounty
      *            The bounty to update
-     * @throws SQLException
+     * @throws DataStorageException
      */
-    public void updateBounty(Bounty bounty) throws SQLException;
+    public void updateBounty(Bounty bounty) throws DataStorageException;
 
     /**
      * Deletes the specified bounty in the database
      * 
      * @param bounty
      *            The bounty to delete
-     * @throws SQLException
+     * @throws DataStorageException
      */
-    public void deleteBounty(Bounty bounty) throws SQLException;
+    public void deleteBounty(Bounty bounty) throws DataStorageException;
 
 }
