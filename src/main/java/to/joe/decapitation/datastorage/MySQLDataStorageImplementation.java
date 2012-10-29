@@ -21,11 +21,11 @@ public class MySQLDataStorageImplementation implements DataStorageInterface {
         plugin = decapitation;
         connection = DriverManager.getConnection(url, username, password);
     }
-    
+
     private PreparedStatement getFreshPreparedStatementColdFromTheRefrigerator(String query) throws SQLException {
         return connection.prepareStatement(query);
     }
-    
+
     private PreparedStatement getFreshPreparedStatementWithGeneratedKeys(String query) throws SQLException {
         return connection.prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
     }

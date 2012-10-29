@@ -15,7 +15,7 @@ public class Head {
     public Head(CraftItemStack itemStack) {
         s = itemStack.getHandle();
     }
-    
+
     public Head(CraftItemStack itemStack, Location l) {
         s = itemStack.getHandle();
         CraftWorld world = (CraftWorld) l.getWorld();

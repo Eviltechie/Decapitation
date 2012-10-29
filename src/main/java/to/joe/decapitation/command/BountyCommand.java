@@ -25,7 +25,7 @@ public class BountyCommand implements CommandExecutor {
     public BountyCommand(Decapitation decapitation) {
         plugin = decapitation;
     }
-    
+
     private void sendHelp(CommandSender sender) {
         sender.sendMessage(ChatColor.RED + "/bounty search [username] - search for a bounty on a player");
         sender.sendMessage(ChatColor.RED + "/bounty list <page> - list current bounties");

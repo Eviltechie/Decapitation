@@ -1,5 +1,11 @@
 package to.joe.decapitation;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.sql.SQLException;
 import java.util.logging.Level;
 
@@ -62,6 +68,27 @@ public class Decapitation extends JavaPlugin implements Listener {
         getCommand("setname").setExecutor(new SetNameCommand());
         getCommand("spawnhead").setExecutor(new SpawnHeadCommand());
         getCommand("bounty").setExecutor(new BountyCommand(this));
+        File f = new File(getDataFolder(), "mysql.sql");
+        if (!f.exists()) {
+            InputStream in;
+            OutputStream out;
+            try {
+                in = getResource("mysql.sql");
+                out = new FileOutputStream(f);
+                byte[] buffer = new byte[1024];
+                int len = in.read(buffer);
+                while (len != -1) {
+                    out.write(buffer, 0, len);
+                    len = in.read(buffer);
+                }
+                in.close();
+                out.close();
+            } catch (FileNotFoundException e) {
+                getLogger().log(Level.SEVERE, "Error writing sql file", e);
+            } catch (IOException e) {
+                getLogger().log(Level.SEVERE, "Error writing sql file", e);
+            }
+        }
         if (getConfig().getBoolean("bounty.enabled")) {
             bounties = setupEconomy();
             if (bounties)
