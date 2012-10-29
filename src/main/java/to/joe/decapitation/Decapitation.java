@@ -29,6 +29,7 @@ import to.joe.decapitation.command.SpawnHeadCommand;
 import to.joe.decapitation.datastorage.DataStorageException;
 import to.joe.decapitation.datastorage.DataStorageInterface;
 import to.joe.decapitation.datastorage.MySQLDataStorageImplementation;
+import to.joe.decapitation.datastorage.YamlDataStorageImplementation;
 
 public class Decapitation extends JavaPlugin implements Listener {
 
@@ -98,11 +99,20 @@ public class Decapitation extends JavaPlugin implements Listener {
                 getLogger().info("Econ not detected");
         }
         if (bounties) {
-            try {
-                dsi = new MySQLDataStorageImplementation(this, getConfig().getString("database.url"), getConfig().getString("database.username"), getConfig().getString("database.password"));
-            } catch (SQLException e) {
-                getLogger().log(Level.SEVERE, "Error connecting to mysql database", e);
-                bounties = false;
+            if (getConfig().getString("datastorage").equalsIgnoreCase("mysql")) {
+                try {
+                    dsi = new MySQLDataStorageImplementation(this, getConfig().getString("database.url"), getConfig().getString("database.username"), getConfig().getString("database.password"));
+                } catch (SQLException e) {
+                    getLogger().log(Level.SEVERE, "Error connecting to mysql database", e);
+                    bounties = false;
+                }
+            } else if (getConfig().getString("datastorage").equalsIgnoreCase("yaml")) {
+                try {
+                    dsi = new YamlDataStorageImplementation(this);
+                } catch (IOException e) {
+                    getLogger().log(Level.SEVERE, "Error setting up yaml storage", e);
+                    bounties = false;
+                }
             }
         }
         if (bounties)
