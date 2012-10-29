@@ -199,6 +199,10 @@ public class BountyCommand implements CommandExecutor {
                 return true;
             }
             if (args[0].equalsIgnoreCase("remove")) {
+                if (!args[1].matches("[A-Za-z0-9_]{2,16}")) {
+                    sender.sendMessage(ChatColor.RED + "That doesn't appear to be a valid username");
+                    return true;
+                }
                 try {
                     Bounty bounty = plugin.getDsi().getBounty(args[1], p.getName());
                     if (bounty != null) {
@@ -219,6 +223,10 @@ public class BountyCommand implements CommandExecutor {
             return true;
         }
         if (args.length == 3 && args[0].equalsIgnoreCase("place")) {
+            if (!args[1].matches("[A-Za-z0-9_]{2,16}")) {
+                sender.sendMessage(ChatColor.RED + "That doesn't appear to be a valid username");
+                return true;
+            }
             try {
                 Bounty bounty = plugin.getDsi().getBounty(args[1], p.getName());
                 int reward = Integer.parseInt(args[2]);
