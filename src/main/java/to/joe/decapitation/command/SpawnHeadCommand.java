@@ -36,7 +36,12 @@ public class SpawnHeadCommand implements CommandExecutor {
         }
         CraftItemStack c = new CraftItemStack(Decapitation.HEAD, numHeads, (short) 0, (byte) 3);
         new Head(c).setName(args[0]);
-        ((Player) sender).getInventory().addItem(c);
+        int empty = ((Player) sender).getInventory().firstEmpty();
+        if (empty > 35) {
+            sender.sendMessage(ChatColor.RED + "No free room!");
+            return true;
+        }
+        ((Player) sender).getInventory().setItem(empty, c);
         return true;
     }
 

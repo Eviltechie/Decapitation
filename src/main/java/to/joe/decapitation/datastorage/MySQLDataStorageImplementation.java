@@ -166,7 +166,7 @@ public class MySQLDataStorageImplementation implements DataStorageInterface {
         while (rs.next()) {
             bounties.add(new Bounty(rs.getInt(1), rs.getString(2), rs.getString(3), rs.getDouble(4), rs.getTimestamp(5), rs.getString(6), rs.getTimestamp(7), rs.getTimestamp(8)));
         }
-        return null;
+        return bounties;
     }
 
 }
