@@ -24,7 +24,7 @@ public class YamlDataStorageImplementation implements DataStorageInterface {
     public YamlDataStorageImplementation (Decapitation plugin) throws IOException {
         this.plugin = plugin;
         
-        this.configFile = new File(plugin.getDataFolder() + File.pathSeparator + "bounties.yml");
+        this.configFile = new File(plugin.getDataFolder(), "bounties.yml");
         if (!(configFile.exists() && !configFile.isDirectory())) {
             configFile.createNewFile();
         }
