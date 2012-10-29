@@ -245,6 +245,7 @@ public class BountyCommand implements CommandExecutor {
                 plugin.getLogger().log(Level.SEVERE, "Error adding bounty", e);
                 sender.sendMessage(ChatColor.RED + "Something went wrong :(");
             }
+            return true;
         }
         sendHelp(sender);
         return true;
