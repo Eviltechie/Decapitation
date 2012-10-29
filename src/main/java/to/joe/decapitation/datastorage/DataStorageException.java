@@ -10,5 +10,9 @@ public class DataStorageException extends Exception{
     public DataStorageException(Throwable cause) {
         super(cause);
     }
+
+    public DataStorageException(String cause) {
+        super(cause);
+    }
     
 }

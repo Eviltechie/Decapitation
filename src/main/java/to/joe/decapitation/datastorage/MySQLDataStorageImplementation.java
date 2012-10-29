@@ -1,11 +1,15 @@
 package to.joe.decapitation.datastorage;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.sql.Timestamp;
 import java.sql.Types;
 import java.util.ArrayList;
 import java.util.List;
@@ -21,6 +25,20 @@ public class MySQLDataStorageImplementation implements DataStorageInterface {
     public MySQLDataStorageImplementation(Decapitation decapitation, String url, String username, String password) throws SQLException {
         plugin = decapitation;
         connection = DriverManager.getConnection(url, username, password);
+        
+        final ResultSet bansExists = connection.getMetaData().getTables(null, null, "bounties", null);
+        if (!bansExists.first()) {
+            final BufferedReader reader = new BufferedReader(new InputStreamReader(plugin.getResource("create.sql")));
+            final StringBuilder builder = new StringBuilder();
+            String next;
+            try {
+                while ((next = reader.readLine()) != null) {
+                    builder.append(next);
+                }
+            } catch (final IOException e) {
+                throw new SQLException("Could not load default table creation text", e);
+            }
+        }
     }
 
     private PreparedStatement getFreshPreparedStatementColdFromTheRefrigerator(String query) throws SQLException {
@@ -31,6 +49,9 @@ public class MySQLDataStorageImplementation implements DataStorageInterface {
         return connection.prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public int getNumBounties() throws DataStorageException {
         try {
@@ -43,10 +64,13 @@ public class MySQLDataStorageImplementation implements DataStorageInterface {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public ArrayList<Bounty> getBounties(int min, int max) throws DataStorageException {
         try {
-            PreparedStatement ps = getFreshPreparedStatementColdFromTheRefrigerator("SELECT * FROM bounties WHERE hunter IS NULL ORDER BY bounties.reward DESC LIMIT 0,9");
+            PreparedStatement ps = getFreshPreparedStatementColdFromTheRefrigerator("SELECT * FROM bounties WHERE hunter IS NULL ORDER BY bounties.reward DESC LIMIT " + min + "," + max);
             ResultSet rs = ps.executeQuery();
             ArrayList<Bounty> bounties = new ArrayList<Bounty>();
             while (rs.next()) {
@@ -58,6 +82,9 @@ public class MySQLDataStorageImplementation implements DataStorageInterface {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Bounty getBounty(String hunted) throws DataStorageException {
         try {
@@ -74,6 +101,9 @@ public class MySQLDataStorageImplementation implements DataStorageInterface {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Bounty addBounty(Bounty bounty) throws DataStorageException {
         try {
@@ -94,6 +124,9 @@ public class MySQLDataStorageImplementation implements DataStorageInterface {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void updateBounty(Bounty bounty) throws DataStorageException {
         try {
@@ -101,7 +134,7 @@ public class MySQLDataStorageImplementation implements DataStorageInterface {
             ps.setString(1, bounty.getIssuer());
             ps.setString(2, bounty.getHunted());
             ps.setDouble(3, bounty.getReward());
-            ps.setTimestamp(4, bounty.getCreated());
+            ps.setTimestamp(4, new Timestamp(bounty.getCreated().getTime()));
             if (bounty.getHunter() == null)
                 ps.setNull(5, Types.VARCHAR);
             else
@@ -110,12 +143,12 @@ public class MySQLDataStorageImplementation implements DataStorageInterface {
             if (bounty.getTurnedIn() == null)
                 ps.setNull(6, Types.TIMESTAMP);
             else
-                ps.setTimestamp(6, bounty.getTurnedIn());
+                ps.setTimestamp(6, new Timestamp(bounty.getTurnedIn().getTime()));
 
             if (bounty.getRedeemed() == null)
                 ps.setNull(7, Types.TIMESTAMP);
             else
-                ps.setTimestamp(7, bounty.getRedeemed());
+                ps.setTimestamp(7, new Timestamp(bounty.getRedeemed().getTime()));
             ps.setInt(8, bounty.getID());
 
             ps.execute();
@@ -124,6 +157,9 @@ public class MySQLDataStorageImplementation implements DataStorageInterface {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void deleteBounty(Bounty bounty) throws DataStorageException {
         try {
@@ -135,6 +171,9 @@ public class MySQLDataStorageImplementation implements DataStorageInterface {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public List<Bounty> getBounties(String hunted) throws DataStorageException {
         try {
@@ -151,6 +190,9 @@ public class MySQLDataStorageImplementation implements DataStorageInterface {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Bounty getBounty(String hunted, String issuer) throws DataStorageException {
         try {
@@ -168,6 +210,9 @@ public class MySQLDataStorageImplementation implements DataStorageInterface {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public List<Bounty> getOwnBounties(String issuer) throws DataStorageException {
         try {
@@ -184,6 +229,9 @@ public class MySQLDataStorageImplementation implements DataStorageInterface {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public int getNumUnclaimedHeads(String issuer) throws DataStorageException {
         try {
@@ -197,6 +245,9 @@ public class MySQLDataStorageImplementation implements DataStorageInterface {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public ArrayList<Bounty> getUnclaimedBounties(String issuer) throws DataStorageException {
         try {

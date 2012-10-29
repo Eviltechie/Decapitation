@@ -1,6 +1,10 @@
 package to.joe.decapitation;
 
 import java.sql.Timestamp;
+import java.util.Comparator;
+import java.util.Date;
+
+import org.bukkit.configuration.ConfigurationSection;
 
 public class Bounty {
 
@@ -13,12 +17,23 @@ public class Bounty {
     }
 
     private double reward;
-    private Timestamp created;
+    private Date created;
     private String hunter;
-    private Timestamp turnedIn;
-    private Timestamp redeemed;
+    private Date turnedIn;
+    private Date redeemed;
 
     public Bounty(int ID, String issuer, String hunted, double reward, Timestamp created, String hunter, Timestamp turnedIn, Timestamp redeemed) {
+        this.ID = ID;
+        this.issuer = issuer;
+        this.hunted = hunted;
+        this.reward = reward;
+        this.created = created;
+        this.hunter = hunter;
+        this.turnedIn = turnedIn;
+        this.redeemed = redeemed;
+    }
+    
+    public Bounty(int ID, String issuer, String hunted, double reward, Date created, String hunter, Date turnedIn, Date redeemed) {
         this.ID = ID;
         this.issuer = issuer;
         this.hunted = hunted;
@@ -33,6 +48,11 @@ public class Bounty {
         this.issuer = issuer;
         this.hunted = hunted;
         this.reward = reward;
+    }
+    
+    public static Bounty fromConfigurationSection (int id, ConfigurationSection section) {
+        return new Bounty(id, section.getString("issuer"), section.getString("hunted"), section.getDouble("reward"), 
+                new Date(section.getLong("created")), section.getString("hunter"), new Date(section.getLong("turnedIn")), new Date(section.getLong("redeemed")));
     }
 
     public double getReward() {
@@ -55,11 +75,11 @@ public class Bounty {
         this.hunter = hunter;
     }
 
-    public void setTurnedIn(Timestamp turnedIn) {
+    public void setTurnedIn(Date turnedIn) {
         this.turnedIn = turnedIn;
     }
 
-    public void setRedeemed(Timestamp redeemed) {
+    public void setRedeemed(Date redeemed) {
         this.redeemed = redeemed;
     }
 
@@ -67,7 +87,7 @@ public class Bounty {
         return ID;
     }
 
-    public Timestamp getCreated() {
+    public Date getCreated() {
         return created;
     }
 
@@ -75,7 +95,7 @@ public class Bounty {
         this.reward = reward;
     }
 
-    public void setCreated(Timestamp created) {
+    public void setCreated(Date created) {
         this.created = created;
     }
 
@@ -83,12 +103,21 @@ public class Bounty {
         return hunter;
     }
 
-    public Timestamp getTurnedIn() {
+    public Date getTurnedIn() {
         return turnedIn;
     }
 
-    public Timestamp getRedeemed() {
+    public Date getRedeemed() {
         return redeemed;
+    }
+    
+    public static class BountyRewardComparator implements Comparator<Bounty> {
+
+        @Override
+        public int compare(Bounty o1, Bounty o2) {
+            return (o1.getReward() < o2.getReward()) ? -1 : (o1.getReward() > o2.getReward()) ? 1:0;
+        }
+        
     }
 
 }

@@ -1,11 +1,6 @@
 package to.joe.decapitation;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.sql.SQLException;
 import java.util.logging.Level;
 
@@ -29,6 +24,7 @@ import to.joe.decapitation.command.SpawnHeadCommand;
 import to.joe.decapitation.datastorage.DataStorageException;
 import to.joe.decapitation.datastorage.DataStorageInterface;
 import to.joe.decapitation.datastorage.MySQLDataStorageImplementation;
+import to.joe.decapitation.datastorage.YamlDataStorageImplementation;
 
 public class Decapitation extends JavaPlugin implements Listener {
 
@@ -62,34 +58,17 @@ public class Decapitation extends JavaPlugin implements Listener {
     public void onEnable() {
         getConfig().options().copyDefaults(true);
         saveConfig();
+        
         allDeaths = getConfig().getDouble("dropSkulls.allDeaths");
         killedByPlayer = getConfig().getDouble("dropSkulls.killedByPlayer");
         tax = getConfig().getDouble("bounty.tax");
+        
         getServer().getPluginManager().registerEvents(this, this);
+        
         getCommand("setname").setExecutor(new SetNameCommand());
         getCommand("spawnhead").setExecutor(new SpawnHeadCommand());
         getCommand("bounty").setExecutor(new BountyCommand(this));
-        File f = new File(getDataFolder(), "mysql.sql");
-        if (!f.exists()) {
-            InputStream in;
-            OutputStream out;
-            try {
-                in = getResource("mysql.sql");
-                out = new FileOutputStream(f);
-                byte[] buffer = new byte[1024];
-                int len = in.read(buffer);
-                while (len != -1) {
-                    out.write(buffer, 0, len);
-                    len = in.read(buffer);
-                }
-                in.close();
-                out.close();
-            } catch (FileNotFoundException e) {
-                getLogger().log(Level.SEVERE, "Error writing sql file", e);
-            } catch (IOException e) {
-                getLogger().log(Level.SEVERE, "Error writing sql file", e);
-            }
-        }
+        
         if (getConfig().getBoolean("bounty.enabled")) {
             bounties = setupEconomy();
             if (bounties)
@@ -98,11 +77,20 @@ public class Decapitation extends JavaPlugin implements Listener {
                 getLogger().info("Econ not detected");
         }
         if (bounties) {
-            try {
-                dsi = new MySQLDataStorageImplementation(this, getConfig().getString("database.url"), getConfig().getString("database.username"), getConfig().getString("database.password"));
-            } catch (SQLException e) {
-                getLogger().log(Level.SEVERE, "Error connecting to mysql database", e);
-                bounties = false;
+            if (getConfig().getString("datastorage").equalsIgnoreCase("mysql")) {
+                try {
+                    dsi = new MySQLDataStorageImplementation(this, getConfig().getString("database.url"), getConfig().getString("database.username"), getConfig().getString("database.password"));
+                } catch (SQLException e) {
+                    getLogger().log(Level.SEVERE, "Error connecting to mysql database", e);
+                    bounties = false;
+                }
+            } else if (getConfig().getString("datastorage").equalsIgnoreCase("yaml")) {
+                try {
+                    dsi = new YamlDataStorageImplementation(this);
+                } catch (IOException e) {
+                    getLogger().log(Level.SEVERE, "Error setting up yaml storage", e);
+                    bounties = false;
+                }
             }
         }
         if (bounties)
