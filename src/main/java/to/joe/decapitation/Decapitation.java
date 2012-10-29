@@ -130,7 +130,7 @@ public class Decapitation extends JavaPlugin implements Listener {
     public void onDeath(PlayerDeathEvent event) {
         Player p = event.getEntity();
         Player k = p.getKiller();
-        if (p.hasPermission("decapitation.dropheads") && (allDeaths > Math.random() || (killedByPlayer > Math.random()) && k != null) && k.hasPermission("decapitation.collectheads")) {
+        if (p.hasPermission("decapitation.dropheads") && (allDeaths > Math.random() || ((killedByPlayer > Math.random()) && k != null)) && (k == null || (k != null && k.hasPermission("decapitation.collectheads")))) {
             CraftItemStack c = new CraftItemStack(HEAD, 1, (short) 0, (byte) 3);
             new Head(c).setName(event.getEntity().getName());
             event.getDrops().add(c);
