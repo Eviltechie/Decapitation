@@ -95,7 +95,7 @@ public class BountyCommand implements CommandExecutor {
                             CraftItemStack c = new CraftItemStack(Decapitation.HEAD, 1, (short) 0, (byte) 3);
                             new Head(c).setName(hunted);
                             int empty = ((Player) sender).getInventory().firstEmpty();
-                            if (empty > 35) {
+                            if (empty == -1) {
                                 i.sendMessage(ChatColor.RED + "Not enough room in your inventory to give you a skull");
                                 return true;
                             }
@@ -138,7 +138,7 @@ public class BountyCommand implements CommandExecutor {
                         CraftItemStack c = new CraftItemStack(Decapitation.HEAD, 1, (short) 0, (byte) 3);
                         new Head(c).setName(b.getHunted());
                         int empty = ((Player) sender).getInventory().firstEmpty();
-                        if (empty > 35) {
+                        if (empty == -1) {
                             sender.sendMessage(ChatColor.RED + "Not enough free room");
                             return true;
                         }
