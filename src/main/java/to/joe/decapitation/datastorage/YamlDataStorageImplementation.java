@@ -284,7 +284,7 @@ public class YamlDataStorageImplementation implements DataStorageInterface {
         if (this.config.getConfigurationSection("bounties").getConfigurationSection(Integer.toString(bounty.getID())) == null) {
             throw new DataStorageException("Tried to delete a bounty whose id didn't exist!");
         }
-        this.config.set("bounties" + Integer.toString(bounty.getID()), null);
+        this.config.set("bounties." + Integer.toString(bounty.getID()), null);
         if (bounty.getID() == this.lastId) {
             lastId--;
         }
