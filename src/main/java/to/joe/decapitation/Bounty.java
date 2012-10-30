@@ -111,7 +111,7 @@ public class Bounty {
         return redeemed;
     }
     
-    public static class BountyComparator implements Comparator<Bounty> {
+    public static class BountyRewardComparator implements Comparator<Bounty> {
 
         @Override
         public int compare(Bounty o1, Bounty o2) {

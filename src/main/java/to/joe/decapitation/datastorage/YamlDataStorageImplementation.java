@@ -11,7 +11,7 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 
 import to.joe.decapitation.Bounty;
-import to.joe.decapitation.Bounty.BountyComparator;
+import to.joe.decapitation.Bounty.BountyRewardComparator;
 import to.joe.decapitation.Decapitation;
 
 public class YamlDataStorageImplementation implements DataStorageInterface {
@@ -136,7 +136,7 @@ public class YamlDataStorageImplementation implements DataStorageInterface {
                 int keyValue = Integer.valueOf(key);
                 ConfigurationSection section = config.getConfigurationSection("bounties").getConfigurationSection(key);
                 
-                if (section.getString("hunter") != null) {
+                if (section.getString("hunter") == null) {
                     allBounties.add(Bounty.fromConfigurationSection(keyValue, section));
                 }
             } catch (NumberFormatException e) {
@@ -145,7 +145,7 @@ public class YamlDataStorageImplementation implements DataStorageInterface {
             }
         }
         
-        Collections.sort(allBounties, Collections.reverseOrder(new BountyComparator()));
+        Collections.sort(allBounties, Collections.reverseOrder(new BountyRewardComparator()));
         if (allBounties.size() < max) {
             max = allBounties.size() - 1;
         }
@@ -169,7 +169,7 @@ public class YamlDataStorageImplementation implements DataStorageInterface {
             try {
                 int keyValue = Integer.valueOf(key);
                 ConfigurationSection section = config.getConfigurationSection("bounties").getConfigurationSection(key);
-                if (hunted.equalsIgnoreCase(section.getString("hunted")) && section.getString("hunter") == null) {
+                if (section.getString("hunted") != null && section.getString("hunted").matches(".*" + hunted + ".*") && section.getString("hunter") == null) {
                     bounties.add(Bounty.fromConfigurationSection(keyValue, section));
                 }
             } catch (NumberFormatException e) {
@@ -178,7 +178,7 @@ public class YamlDataStorageImplementation implements DataStorageInterface {
             }
         }
         
-        Collections.sort(bounties, new BountyComparator());
+        Collections.sort(bounties, new BountyRewardComparator());
         
         return bounties;
     }
@@ -222,7 +222,7 @@ public class YamlDataStorageImplementation implements DataStorageInterface {
             }
         }
         
-        Collections.sort(bounties, Collections.reverseOrder(new BountyComparator()));
+        Collections.sort(bounties, Collections.reverseOrder(new BountyRewardComparator()));
         
         return (bounties.size() == 0) ? null : bounties.get(0);
     }
@@ -245,7 +245,7 @@ public class YamlDataStorageImplementation implements DataStorageInterface {
             }
         }
         
-        Collections.sort(bounties, Collections.reverseOrder(new BountyComparator()));
+        Collections.sort(bounties, Collections.reverseOrder(new BountyRewardComparator()));
         
         return (bounties.size() == 0) ? null : bounties.get(0);
     }
