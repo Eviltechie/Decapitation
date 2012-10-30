@@ -1,5 +1,8 @@
 package to.joe.decapitation.datastorage;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -22,6 +25,20 @@ public class MySQLDataStorageImplementation implements DataStorageInterface {
     public MySQLDataStorageImplementation(Decapitation decapitation, String url, String username, String password) throws SQLException {
         plugin = decapitation;
         connection = DriverManager.getConnection(url, username, password);
+        
+        final ResultSet bansExists = connection.getMetaData().getTables(null, null, "bounties", null);
+        if (!bansExists.first()) {
+            final BufferedReader reader = new BufferedReader(new InputStreamReader(plugin.getResource("create.sql")));
+            final StringBuilder builder = new StringBuilder();
+            String next;
+            try {
+                while ((next = reader.readLine()) != null) {
+                    builder.append(next);
+                }
+            } catch (final IOException e) {
+                throw new SQLException("Could not load default table creation text", e);
+            }
+        }
     }
 
     private PreparedStatement getFreshPreparedStatementColdFromTheRefrigerator(String query) throws SQLException {
