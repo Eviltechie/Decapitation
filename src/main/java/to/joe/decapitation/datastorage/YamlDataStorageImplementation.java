@@ -89,7 +89,7 @@ public class YamlDataStorageImplementation implements DataStorageInterface {
                 Integer.valueOf(key);
                 ConfigurationSection section = config.getConfigurationSection("bounties").getConfigurationSection(key);
                 if (issuer.equalsIgnoreCase(section.getString("issuer"))) {
-                    if (section.get("turnedin") != null && section.get("reedemed") == null) {
+                    if (section.getLong("turnedin") != 0 && section.getLong("reedemed") == 0) {
                         count++;
                     }
                 }
@@ -146,14 +146,14 @@ public class YamlDataStorageImplementation implements DataStorageInterface {
         }
         
         Collections.sort(allBounties, Collections.reverseOrder(new BountyRewardComparator()));
-        if (allBounties.size() < max) {
+        if ((allBounties.size() - 1) < max) {
             max = allBounties.size() - 1;
         }
         if (min > allBounties.size()) {
             return bounties;
         }
         
-        for (int i = min; i < max; i++) {
+        for (int i = min; i <= max; i++) {
             bounties.add(allBounties.get(i));
         }
         
