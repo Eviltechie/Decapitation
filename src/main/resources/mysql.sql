@@ -1,7 +1,3 @@
---
--- Table structure for table `bounties`
---
-
 CREATE TABLE IF NOT EXISTS `bounties` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `issuer` varchar(16) NOT NULL,

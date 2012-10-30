@@ -28,17 +28,19 @@ public class MySQLDataStorageImplementation implements DataStorageInterface {
         
         final ResultSet bansExists = connection.getMetaData().getTables(null, null, "bounties", null);
         if (!bansExists.first()) {
-            final BufferedReader reader = new BufferedReader(new InputStreamReader(plugin.getResource("create.sql")));
+            final BufferedReader reader = new BufferedReader(new InputStreamReader(plugin.getResource("mysql.sql")));
             final StringBuilder builder = new StringBuilder();
             String next;
             try {
                 while ((next = reader.readLine()) != null) {
                     builder.append(next);
                 }
+                getFreshPreparedStatementColdFromTheRefrigerator(builder.toString()).execute();
             } catch (final IOException e) {
                 throw new SQLException("Could not load default table creation text", e);
             }
         }
+        
     }
 
     private PreparedStatement getFreshPreparedStatementColdFromTheRefrigerator(String query) throws SQLException {
