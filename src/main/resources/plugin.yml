@@ -17,8 +17,6 @@ commands:
     usage: /<command> [playername] <quantity>
   bounty:
     description: Place, claim, and search bounties bounties
-    permission: decapitation.bounty
-    permission-message: You may not use bounties
     usage: /<command>
 permissions:
   decapitation.setname:
@@ -33,5 +31,28 @@ permissions:
   decapitation.collectheads:
     description: Ability to collect heads when killing another player
     default: true
+  decapitation.info:
+    description: Get the name of a head
   decapitation.bounty:
     description: Place, claim, and search bounties bounties
+    children:
+      decapitation.bounty.search: true
+      decapitation.bounty.list: true
+      decapitation.bounty.place: true
+      decapitation.bounty.claim: true
+      decapitation.bounty.remove: true
+      decapitation.bounty.listown: true
+  decapitation.bounty.search:
+    description: Search bounties
+  decapitation.bounty.list:
+    description: List bounties
+  decapitation.bounty.place:
+    description: Place bounties
+  decapitation.bounty.claim:
+    description: Claim (turn in) bounties
+  decapitation.bounty.remove:
+    description: Remove own bounties
+  decapitation.bounty.listown:
+    description: List own bounties
+  decapitation.bounty.viewissuer:
+    description: View who placed bounties when listing

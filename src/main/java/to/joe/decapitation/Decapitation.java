@@ -12,8 +12,10 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
+import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -33,6 +35,8 @@ public class Decapitation extends JavaPlugin implements Listener {
     double allDeaths;
     double killedByPlayer;
     public boolean bounties = false;
+    private boolean huntedDropOnly;
+    public boolean canClaimOwn;
     private double tax;
     private DataStorageInterface dsi;
 
@@ -59,9 +63,11 @@ public class Decapitation extends JavaPlugin implements Listener {
         getConfig().options().copyDefaults(true);
         saveConfig();
         
-        allDeaths = getConfig().getDouble("dropSkulls.allDeaths");
-        killedByPlayer = getConfig().getDouble("dropSkulls.killedByPlayer");
-        tax = getConfig().getDouble("bounty.tax");
+        allDeaths = getConfig().getDouble("dropSkulls.allDeaths", 0);
+        killedByPlayer = getConfig().getDouble("dropSkulls.killedByPlayer", 1);
+        tax = getConfig().getDouble("bounty.tax", 0.05D);
+        huntedDropOnly = getConfig().getBoolean("bounty.huntedDropOnly", false);
+        canClaimOwn = getConfig().getBoolean("bounty.canClaimOwn", true);
         
         getServer().getPluginManager().registerEvents(this, this);
         
@@ -119,6 +125,13 @@ public class Decapitation extends JavaPlugin implements Listener {
     public void onDeath(PlayerDeathEvent event) {
         Player p = event.getEntity();
         Player k = p.getKiller();
+        try {
+            if (bounties && huntedDropOnly && dsi.getBounty(p.getName()) == null) {
+                return;
+            }
+        } catch (DataStorageException e) {
+            getLogger().log(Level.SEVERE, "Error getting if player has bounty", e);
+        }
         if (p.hasPermission("decapitation.dropheads") && (allDeaths > Math.random() || ((killedByPlayer > Math.random()) && k != null)) && (k == null || (k != null && k.hasPermission("decapitation.collectheads")))) {
             CraftItemStack c = new CraftItemStack(HEAD, 1, (short) 0, (byte) 3);
             new Head(c).setName(event.getEntity().getName());
@@ -141,6 +154,18 @@ public class Decapitation extends JavaPlugin implements Listener {
                 else
                     event.getPlayer().sendMessage(ChatColor.GOLD + "You have " + unclaimedHeads + " unclaimed heads.");
                 event.getPlayer().sendMessage(ChatColor.GOLD + "Type /bounty redeem to receive them");
+            }
+        }
+    }
+    
+    @EventHandler
+    public void onInteract(PlayerInteractEvent event) {
+        if (event.getAction() == Action.RIGHT_CLICK_BLOCK && event.getPlayer().hasPermission("decapitation.info") && event.getClickedBlock().getTypeId() == HEADBLOCK) {
+            String name = new Head(new CraftItemStack(HEAD, 1, (short) 0, (byte) 3), event.getClickedBlock().getLocation()).getName();
+            if (name.equals("")) {
+                event.getPlayer().sendMessage(ChatColor.GREEN + "That head has no name attached");
+            } else {
+                event.getPlayer().sendMessage(ChatColor.GREEN + "The head of " + name);
             }
         }
     }

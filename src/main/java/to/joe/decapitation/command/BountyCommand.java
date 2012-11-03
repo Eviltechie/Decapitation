@@ -27,14 +27,22 @@ public class BountyCommand implements CommandExecutor {
     }
 
     private void sendHelp(CommandSender sender) {
-        sender.sendMessage(ChatColor.RED + "/bounty search [username] - search for a bounty on a player");
-        sender.sendMessage(ChatColor.RED + "/bounty list <page> - list current bounties");
-        sender.sendMessage(ChatColor.RED + "/bounty place [username] [price] - place a bounty on a player");
-        sender.sendMessage(ChatColor.RED + "/bounty claim - claim the bounty of the head you are holding");
-        sender.sendMessage(ChatColor.RED + "/bounty remove [username] - remove the bounty of a player");
-        sender.sendMessage(ChatColor.RED + "/bounty listown - list unclaimed bounties you have created");
-        sender.sendMessage(ChatColor.RED + "/bounty redeem - claim any heads that are owed to you");
-        sender.sendMessage(ChatColor.RED + "Current tax rate is " + plugin.getTax() + "%");
+        if (sender.hasPermission("decapitation.bounty.search"))
+            sender.sendMessage(ChatColor.RED + "/bounty search [username] - search for a bounty on a player");
+        if (sender.hasPermission("decapitation.bounty.list"))
+            sender.sendMessage(ChatColor.RED + "/bounty list <page> - list current bounties");
+        if (sender.hasPermission("decapitation.bounty.place"))
+            sender.sendMessage(ChatColor.RED + "/bounty place [username] [price] - place a bounty on a player");
+        if (sender.hasPermission("decapitation.bounty.claim"))
+            sender.sendMessage(ChatColor.RED + "/bounty claim - claim the bounty of the head you are holding");
+        if (sender.hasPermission("decapitation.bounty.remove"))
+            sender.sendMessage(ChatColor.RED + "/bounty remove [username] - remove the bounty of a player");
+        if (sender.hasPermission("decapitation.bounty.listown"))
+            sender.sendMessage(ChatColor.RED + "/bounty listown - list unclaimed bounties you have created");
+        if (sender.hasPermission("decapitation.bounty.place")) {
+            sender.sendMessage(ChatColor.RED + "/bounty redeem - claim any heads that are owed to you");
+            sender.sendMessage(ChatColor.RED + "Current tax rate is " + plugin.getTax() + "%");
+        }
     }
 
     public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
@@ -52,13 +60,17 @@ public class BountyCommand implements CommandExecutor {
         }
         Player p = (Player) sender;
         if (args.length == 1) {
-            if (args[0].equalsIgnoreCase("list")) {
+            if (args[0].equalsIgnoreCase("list") && sender.hasPermission("decapitation.bounty.list")) {
                 try {
                     List<Bounty> bounties = plugin.getDsi().getBounties(0, 9);
                     if (bounties.size() > 0) {
-                        sender.sendMessage(ChatColor.GREEN + "=========" + ChatColor.GOLD + "Bounties [Page 1 of " + (plugin.getDsi().getNumBounties() + 8) / 9 + "]" + ChatColor.GREEN + "=========");
+                        sender.sendMessage(ChatColor.GREEN + "=========" + ChatColor.GOLD + " Bounties [Page 1 of " + (plugin.getDsi().getNumBounties() + 8) / 9 + "] " + ChatColor.GREEN + "=========");
                         for (Bounty b : bounties) {
-                            sender.sendMessage(ChatColor.GOLD + "" + b.getReward() + " - " + b.getHunted());
+                            if (sender.hasPermission("decapitation.bounty.viewissuer")) {
+                                sender.sendMessage(ChatColor.GOLD + "" + b.getReward() + " - " + b.getHunted() + " placed by " + b.getIssuer());
+                            } else {
+                                sender.sendMessage(ChatColor.GOLD + "" + b.getReward() + " - " + b.getHunted());
+                            }
                         }
                     } else {
                         sender.sendMessage(ChatColor.RED + "There are no bounties");
@@ -69,7 +81,7 @@ public class BountyCommand implements CommandExecutor {
                 }
                 return true;
             }
-            if (args[0].equalsIgnoreCase("claim")) {
+            if (args[0].equalsIgnoreCase("claim") && sender.hasPermission("decapitation.bounty.claim")) {
                 if (p.getItemInHand().getTypeId() != Decapitation.HEAD) {
                     sender.sendMessage(ChatColor.RED + "That's not a head");
                     return true;
@@ -77,6 +89,10 @@ public class BountyCommand implements CommandExecutor {
                 Head h = new Head((CraftItemStack) p.getItemInHand());
                 if (!h.isNamed()) {
                     sender.sendMessage(ChatColor.RED + "That head is not named");
+                    return true;
+                }
+                if (!plugin.canClaimOwn && h.getName().equals(p.getName())) {
+                    sender.sendMessage(ChatColor.RED + "You may not turn in your own head");
                     return true;
                 }
                 try {
@@ -114,13 +130,17 @@ public class BountyCommand implements CommandExecutor {
                 }
                 return true;
             }
-            if (args[0].equalsIgnoreCase("listown")) {
+            if (args[0].equalsIgnoreCase("listown") && sender.hasPermission("decapitation.bounty.listown")) {
                 try {
                     List<Bounty> bounties = plugin.getDsi().getOwnBounties(p.getName());
                     if (bounties.size() > 0) {
-                        sender.sendMessage(ChatColor.GREEN + "=========" + ChatColor.GOLD + "Your bounties" + ChatColor.GREEN + "=========");
+                        sender.sendMessage(ChatColor.GREEN + "========= " + ChatColor.GOLD + "Your bounties " + ChatColor.GREEN + "=========");
                         for (Bounty b : bounties) {
-                            sender.sendMessage(ChatColor.GOLD + "" + b.getReward() + " - " + b.getHunted());
+                            if (sender.hasPermission("decapitation.bounty.viewissuer")) {
+                                sender.sendMessage(ChatColor.GOLD + "" + b.getReward() + " - " + b.getHunted() + " placed by " + b.getIssuer());
+                            } else {
+                                sender.sendMessage(ChatColor.GOLD + "" + b.getReward() + " - " + b.getHunted());
+                            }
                         }
                     } else {
                         sender.sendMessage(ChatColor.RED + "You have no bounties");
@@ -131,9 +151,12 @@ public class BountyCommand implements CommandExecutor {
                 }
                 return true;
             }
-            if (args[0].equalsIgnoreCase("redeem")) {
+            if (args[0].equalsIgnoreCase("redeem") && sender.hasPermission("decapitation.bounty.place")) {
                 try {
                     List<Bounty> bounties = plugin.getDsi().getUnclaimedBounties(p.getName());
+                    if (bounties.size() == 0) {
+                        sender.sendMessage(ChatColor.RED + "Nothing to redeem");
+                    }
                     for (Bounty b : bounties) {
                         CraftItemStack c = new CraftItemStack(Decapitation.HEAD, 1, (short) 0, (byte) 3);
                         new Head(c).setName(b.getHunted());
@@ -156,17 +179,23 @@ public class BountyCommand implements CommandExecutor {
             return true;
         }
         if (args.length == 2) {
-            if (args[0].equalsIgnoreCase("search")) {
+            if (args[0].equalsIgnoreCase("search") && sender.hasPermission("decapitation.bounty.search")) {
                 try {
                     List<Bounty> bounties = plugin.getDsi().getBounties(args[1]);
                     int count = 0;
                     if (bounties.size() > 0) {
-                        sender.sendMessage(ChatColor.GREEN + "=========" + ChatColor.GOLD + "Bounties matching " + args[1] + " " + ChatColor.GREEN + "=========");
+                        sender.sendMessage(ChatColor.GREEN + "=========" + ChatColor.GOLD + " Bounties matching " + args[1] + " " + ChatColor.GREEN + "=========");
                         for (Bounty b : bounties) {
-                            sender.sendMessage(ChatColor.GOLD + "" + b.getReward() + " - " + b.getHunted());
+                            if (sender.hasPermission("decapitation.bounty.viewissuer")) {
+                                sender.sendMessage(ChatColor.GOLD + "" + b.getReward() + " - " + b.getHunted() + " placed by " + b.getIssuer());
+                            } else {
+                                sender.sendMessage(ChatColor.GOLD + "" + b.getReward() + " - " + b.getHunted());
+                            }
                             count++;
-                            if (count == 9)
+                            if (count == 8) {
+                                sender.sendMessage(ChatColor.GOLD + "Plus " + (bounties.size() - count) + " more");
                                 return true;
+                            }
                         }
                     } else {
                         sender.sendMessage(ChatColor.RED + "No bounties match your query");
@@ -178,14 +207,18 @@ public class BountyCommand implements CommandExecutor {
                 }
                 return true;
             }
-            if (args[0].equalsIgnoreCase("list")) {
+            if (args[0].equalsIgnoreCase("list") && sender.hasPermission("decapitation.bounty.list")) {
                 try {
                     int page = Integer.parseInt(args[1]);
                     List<Bounty> bounties = plugin.getDsi().getBounties((page - 1) * 9, page * 9);
                     if (bounties.size() > 0) {
                         sender.sendMessage(ChatColor.GREEN + "=========" + ChatColor.GOLD + "Bounties [Page 1 of " + (plugin.getDsi().getNumBounties() + 8) / 9 + "]" + ChatColor.GREEN + "=========");
                         for (Bounty b : bounties) {
-                            sender.sendMessage(ChatColor.GOLD + "" + b.getReward() + " - " + b.getHunted());
+                            if (sender.hasPermission("decapitation.bounty.viewissuer")) {
+                                sender.sendMessage(ChatColor.GOLD + "" + b.getReward() + " - " + b.getHunted() + " placed by " + b.getIssuer());
+                            } else {
+                                sender.sendMessage(ChatColor.GOLD + "" + b.getReward() + " - " + b.getHunted());
+                            }
                         }
                     } else {
                         sender.sendMessage(ChatColor.RED + "There are no bounties");
@@ -198,7 +231,7 @@ public class BountyCommand implements CommandExecutor {
                 }
                 return true;
             }
-            if (args[0].equalsIgnoreCase("remove")) {
+            if (args[0].equalsIgnoreCase("remove") && sender.hasPermission("decapitation.bounty.remove")) {
                 if (!args[1].matches("[A-Za-z0-9_]{2,16}")) {
                     sender.sendMessage(ChatColor.RED + "That doesn't appear to be a valid username");
                     return true;
@@ -222,7 +255,7 @@ public class BountyCommand implements CommandExecutor {
             sendHelp(sender);
             return true;
         }
-        if (args.length == 3 && args[0].equalsIgnoreCase("place")) {
+        if (args.length == 3 && args[0].equalsIgnoreCase("place") && sender.hasPermission("decapitation.bounty.place")) {
             if (!args[1].matches("[A-Za-z0-9_]{2,16}")) {
                 sender.sendMessage(ChatColor.RED + "That doesn't appear to be a valid username");
                 return true;
