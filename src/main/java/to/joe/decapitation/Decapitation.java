@@ -10,10 +10,8 @@ import org.bukkit.ChatColor;
 import org.bukkit.craftbukkit.inventory.CraftItemStack;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
-import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
-import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
@@ -62,19 +60,19 @@ public class Decapitation extends JavaPlugin implements Listener {
     public void onEnable() {
         getConfig().options().copyDefaults(true);
         saveConfig();
-        
+
         allDeaths = getConfig().getDouble("dropSkulls.allDeaths", 0);
         killedByPlayer = getConfig().getDouble("dropSkulls.killedByPlayer", 1);
         tax = getConfig().getDouble("bounty.tax", 0.05D);
         huntedDropOnly = getConfig().getBoolean("bounty.huntedDropOnly", false);
         canClaimOwn = getConfig().getBoolean("bounty.canClaimOwn", true);
-        
+
         getServer().getPluginManager().registerEvents(this, this);
-        
+
         getCommand("setname").setExecutor(new SetNameCommand());
         getCommand("spawnhead").setExecutor(new SpawnHeadCommand());
         getCommand("bounty").setExecutor(new BountyCommand(this));
-        
+
         if (getConfig().getBoolean("bounty.enabled")) {
             bounties = setupEconomy();
             if (bounties)
@@ -103,22 +101,6 @@ public class Decapitation extends JavaPlugin implements Listener {
             getLogger().info("Bounties enabled");
         else
             getLogger().info("Bounties not enabled");
-    }
-
-    @EventHandler(priority = EventPriority.HIGHEST)
-    public void onBreak(BlockBreakEvent event) {
-        if (!event.isCancelled() && event.getBlock().getTypeId() == HEADBLOCK) {
-            String name = new Head(new CraftItemStack(HEAD, 1, (short) 0, (byte) 3), event.getBlock().getLocation()).getName();
-            if (name.equals(""))
-                return;
-            Head h = null;
-            CraftItemStack head = new CraftItemStack(HEAD, 1, (short) 0, (byte) 3);
-            head = (CraftItemStack) event.getBlock().getWorld().dropItem(event.getBlock().getLocation(), head).getItemStack();
-            h = new Head(head);
-            h.setName(name);
-            event.getBlock().setTypeId(0);
-            event.setCancelled(true);
-        }
     }
 
     @EventHandler
@@ -157,7 +139,7 @@ public class Decapitation extends JavaPlugin implements Listener {
             }
         }
     }
-    
+
     @EventHandler
     public void onInteract(PlayerInteractEvent event) {
         if (event.getAction() == Action.RIGHT_CLICK_BLOCK && event.getPlayer().hasPermission("decapitation.info") && event.getClickedBlock().getTypeId() == HEADBLOCK) {

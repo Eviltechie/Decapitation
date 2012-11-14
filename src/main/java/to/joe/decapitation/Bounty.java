@@ -32,7 +32,7 @@ public class Bounty {
         this.turnedIn = turnedIn;
         this.redeemed = redeemed;
     }
-    
+
     public Bounty(int ID, String issuer, String hunted, double reward, Date created, String hunter, Date turnedIn, Date redeemed) {
         this.ID = ID;
         this.issuer = issuer;
@@ -49,10 +49,9 @@ public class Bounty {
         this.hunted = hunted;
         this.reward = reward;
     }
-    
-    public static Bounty fromConfigurationSection (int id, ConfigurationSection section) {
-        return new Bounty(id, section.getString("issuer"), section.getString("hunted"), section.getDouble("reward"), 
-                new Date(section.getLong("created")), section.getString("hunter"), new Date(section.getLong("turnedIn")), new Date(section.getLong("redeemed")));
+
+    public static Bounty fromConfigurationSection(int id, ConfigurationSection section) {
+        return new Bounty(id, section.getString("issuer"), section.getString("hunted"), section.getDouble("reward"), new Date(section.getLong("created")), section.getString("hunter"), new Date(section.getLong("turnedIn")), new Date(section.getLong("redeemed")));
     }
 
     public double getReward() {
@@ -110,14 +109,14 @@ public class Bounty {
     public Date getRedeemed() {
         return redeemed;
     }
-    
+
     public static class BountyRewardComparator implements Comparator<Bounty> {
 
         @Override
         public int compare(Bounty o1, Bounty o2) {
-            return (o1.getReward() < o2.getReward()) ? -1 : (o1.getReward() > o2.getReward()) ? 1:0;
+            return (o1.getReward() < o2.getReward()) ? -1 : (o1.getReward() > o2.getReward()) ? 1 : 0;
         }
-        
+
     }
 
 }
