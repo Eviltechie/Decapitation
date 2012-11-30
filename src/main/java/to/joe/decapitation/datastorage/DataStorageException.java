@@ -1,6 +1,6 @@
 package to.joe.decapitation.datastorage;
 
-public class DataStorageException extends Exception{
+public class DataStorageException extends Exception {
 
     /**
      * 
@@ -14,5 +14,5 @@ public class DataStorageException extends Exception{
     public DataStorageException(String cause) {
         super(cause);
     }
-    
+
 }

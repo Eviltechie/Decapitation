@@ -15,15 +15,15 @@ import to.joe.decapitation.Bounty.BountyRewardComparator;
 import to.joe.decapitation.Decapitation;
 
 public class YamlDataStorageImplementation implements DataStorageInterface {
-    
+
     private Decapitation plugin;
     private File configFile;
     private YamlConfiguration config;
     private int lastId;
-    
-    public YamlDataStorageImplementation (Decapitation plugin) throws IOException {
+
+    public YamlDataStorageImplementation(Decapitation plugin) throws IOException {
         this.plugin = plugin;
-        
+
         this.configFile = new File(plugin.getDataFolder(), "bounties.yml");
         if (!(configFile.exists() && !configFile.isDirectory())) {
             configFile.createNewFile();
@@ -32,7 +32,7 @@ public class YamlDataStorageImplementation implements DataStorageInterface {
         if (!config.isConfigurationSection("bounties")) {
             config.createSection("bounties");
         }
-        
+
         lastId = 0;
         Set<String> keys = this.config.getConfigurationSection("bounties").getKeys(false);
         for (String key : keys) {
@@ -50,7 +50,7 @@ public class YamlDataStorageImplementation implements DataStorageInterface {
             }
         }
     }
-    
+
     private void saveConfig() throws DataStorageException {
         try {
             this.config.save(configFile);
@@ -63,7 +63,7 @@ public class YamlDataStorageImplementation implements DataStorageInterface {
     public int getNumBounties() throws DataStorageException {
         Set<String> keys = this.config.getConfigurationSection("bounties").getKeys(false);
         int bounties = 0;
-        
+
         for (String key : keys) {
             try {
                 Integer.valueOf(key);
@@ -83,13 +83,13 @@ public class YamlDataStorageImplementation implements DataStorageInterface {
     public int getNumUnclaimedHeads(String issuer) throws DataStorageException {
         int count = 0;
         Set<String> keys = this.config.getConfigurationSection("bounties").getKeys(false);
-        
+
         for (String key : keys) {
             try {
                 Integer.valueOf(key);
                 ConfigurationSection section = config.getConfigurationSection("bounties").getConfigurationSection(key);
                 if (issuer.equalsIgnoreCase(section.getString("issuer"))) {
-                    if (section.getLong("turnedin") != 0 && section.getLong("reedemed") == 0) {
+                    if (section.getLong("turnedin") != 0 && section.getLong("redeemed") == 0) {
                         count++;
                     }
                 }
@@ -98,7 +98,7 @@ public class YamlDataStorageImplementation implements DataStorageInterface {
                 continue;
             }
         }
-        
+
         return count;
     }
 
@@ -106,7 +106,7 @@ public class YamlDataStorageImplementation implements DataStorageInterface {
     public List<Bounty> getUnclaimedBounties(String issuer) throws DataStorageException {
         List<Bounty> bounties = new ArrayList<Bounty>();
         Set<String> keys = this.config.getConfigurationSection("bounties").getKeys(false);
-        
+
         for (String key : keys) {
             try {
                 int keyValue = Integer.valueOf(key);
@@ -121,7 +121,7 @@ public class YamlDataStorageImplementation implements DataStorageInterface {
                 continue;
             }
         }
-        
+
         return bounties;
     }
 
@@ -129,13 +129,13 @@ public class YamlDataStorageImplementation implements DataStorageInterface {
     public List<Bounty> getBounties(int min, int max) throws DataStorageException {
         List<Bounty> bounties = new ArrayList<Bounty>();
         Set<String> keys = this.config.getConfigurationSection("bounties").getKeys(false);
-        
+
         List<Bounty> allBounties = new ArrayList<Bounty>();
         for (String key : keys) {
             try {
                 int keyValue = Integer.valueOf(key);
                 ConfigurationSection section = config.getConfigurationSection("bounties").getConfigurationSection(key);
-                
+
                 if (section.getString("hunter") == null) {
                     allBounties.add(Bounty.fromConfigurationSection(keyValue, section));
                 }
@@ -144,7 +144,7 @@ public class YamlDataStorageImplementation implements DataStorageInterface {
                 continue;
             }
         }
-        
+
         Collections.sort(allBounties, Collections.reverseOrder(new BountyRewardComparator()));
         if ((allBounties.size() - 1) < max) {
             max = allBounties.size() - 1;
@@ -152,11 +152,11 @@ public class YamlDataStorageImplementation implements DataStorageInterface {
         if (min > allBounties.size()) {
             return bounties;
         }
-        
+
         for (int i = min; i <= max; i++) {
             bounties.add(allBounties.get(i));
         }
-        
+
         return bounties;
     }
 
@@ -164,7 +164,7 @@ public class YamlDataStorageImplementation implements DataStorageInterface {
     public List<Bounty> getBounties(String hunted) throws DataStorageException {
         List<Bounty> bounties = new ArrayList<Bounty>();
         Set<String> keys = this.config.getConfigurationSection("bounties").getKeys(false);
-        
+
         for (String key : keys) {
             try {
                 int keyValue = Integer.valueOf(key);
@@ -177,9 +177,9 @@ public class YamlDataStorageImplementation implements DataStorageInterface {
                 continue;
             }
         }
-        
+
         Collections.sort(bounties, new BountyRewardComparator());
-        
+
         return bounties;
     }
 
@@ -187,7 +187,7 @@ public class YamlDataStorageImplementation implements DataStorageInterface {
     public List<Bounty> getOwnBounties(String issuer) throws DataStorageException {
         List<Bounty> bounties = new ArrayList<Bounty>();
         Set<String> keys = this.config.getConfigurationSection("bounties").getKeys(false);
-        
+
         for (String key : keys) {
             try {
                 int keyValue = Integer.valueOf(key);
@@ -200,7 +200,7 @@ public class YamlDataStorageImplementation implements DataStorageInterface {
                 continue;
             }
         }
-        
+
         return bounties;
     }
 
@@ -208,7 +208,7 @@ public class YamlDataStorageImplementation implements DataStorageInterface {
     public Bounty getBounty(String hunted) throws DataStorageException {
         List<Bounty> bounties = new ArrayList<Bounty>();
         Set<String> keys = this.config.getConfigurationSection("bounties").getKeys(false);
-        
+
         for (String key : keys) {
             try {
                 int keyValue = Integer.valueOf(key);
@@ -221,9 +221,9 @@ public class YamlDataStorageImplementation implements DataStorageInterface {
                 continue;
             }
         }
-        
+
         Collections.sort(bounties, Collections.reverseOrder(new BountyRewardComparator()));
-        
+
         return (bounties.size() == 0) ? null : bounties.get(0);
     }
 
@@ -231,7 +231,7 @@ public class YamlDataStorageImplementation implements DataStorageInterface {
     public Bounty getBounty(String hunted, String issuer) throws DataStorageException {
         List<Bounty> bounties = new ArrayList<Bounty>();
         Set<String> keys = this.config.getConfigurationSection("bounties").getKeys(false);
-        
+
         for (String key : keys) {
             try {
                 int keyValue = Integer.valueOf(key);
@@ -244,9 +244,9 @@ public class YamlDataStorageImplementation implements DataStorageInterface {
                 continue;
             }
         }
-        
+
         Collections.sort(bounties, Collections.reverseOrder(new BountyRewardComparator()));
-        
+
         return (bounties.size() == 0) ? null : bounties.get(0);
     }
 

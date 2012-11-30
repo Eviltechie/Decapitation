@@ -25,7 +25,7 @@ public class MySQLDataStorageImplementation implements DataStorageInterface {
     public MySQLDataStorageImplementation(Decapitation decapitation, String url, String username, String password) throws SQLException {
         plugin = decapitation;
         connection = DriverManager.getConnection(url, username, password);
-        
+
         final ResultSet bansExists = connection.getMetaData().getTables(null, null, "bounties", null);
         if (!bansExists.first()) {
             final BufferedReader reader = new BufferedReader(new InputStreamReader(plugin.getResource("mysql.sql")));
@@ -40,7 +40,7 @@ public class MySQLDataStorageImplementation implements DataStorageInterface {
                 throw new SQLException("Could not load default table creation text", e);
             }
         }
-        
+
     }
 
     private PreparedStatement getFreshPreparedStatementColdFromTheRefrigerator(String query) throws SQLException {

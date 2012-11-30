@@ -11,7 +11,6 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.craftbukkit.inventory.CraftItemStack;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
 
 import to.joe.decapitation.Bounty;
 import to.joe.decapitation.Decapitation;
@@ -105,17 +104,17 @@ public class BountyCommand implements CommandExecutor {
                         plugin.getDsi().updateBounty(b);
                         Decapitation.economy.depositPlayer(p.getName(), b.getReward());
                         sender.sendMessage(ChatColor.GREEN + "Sucessfully turned in bounty on " + b.getHunted() + " for " + Decapitation.economy.format(b.getReward()));
-                        p.setItemInHand(new ItemStack(0));
+                        p.setItemInHand(null);
                         Player i = plugin.getServer().getPlayer(b.getIssuer());
                         if (i != null) {
                             CraftItemStack c = new CraftItemStack(Decapitation.HEAD, 1, (short) 0, (byte) 3);
                             new Head(c).setName(hunted);
-                            int empty = ((Player) sender).getInventory().firstEmpty();
+                            int empty = i.getInventory().firstEmpty();
                             if (empty == -1) {
                                 i.sendMessage(ChatColor.RED + "Not enough room in your inventory to give you a skull");
                                 return true;
                             }
-                            ((Player) sender).getInventory().setItem(empty, c);
+                            i.getInventory().setItem(empty, c);
                             b.setRedeemed(new Timestamp(new Date().getTime()));
                             plugin.getDsi().updateBounty(b);
                         }
@@ -263,6 +262,10 @@ public class BountyCommand implements CommandExecutor {
             try {
                 Bounty bounty = plugin.getDsi().getBounty(args[1], p.getName());
                 int reward = Integer.parseInt(args[2]);
+                if (reward <= 0) {
+                    sender.sendMessage(ChatColor.RED + "You must set a positive bounty");
+                    return true;
+                }
                 if (Decapitation.economy.has(p.getName(), reward + reward * plugin.getTax())) {
                     if (bounty == null) {
                         bounty = new Bounty(p.getName(), args[1], reward);
