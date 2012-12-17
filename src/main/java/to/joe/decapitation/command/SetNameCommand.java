@@ -1,15 +1,13 @@
 package to.joe.decapitation.command;
 
 import org.bukkit.ChatColor;
+import org.bukkit.Material;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
-import org.bukkit.craftbukkit.v1_4_5.inventory.CraftItemStack;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-
-import to.joe.decapitation.Decapitation;
-import to.joe.decapitation.Head;
+import org.bukkit.inventory.meta.SkullMeta;
 
 public class SetNameCommand implements CommandExecutor {
 
@@ -29,10 +27,14 @@ public class SetNameCommand implements CommandExecutor {
             return true;
         }
         Player player = (Player) sender;
-        if (player.getItemInHand().getTypeId() == Decapitation.HEAD) {
-            player.setItemInHand(new ItemStack(Decapitation.HEAD, player.getItemInHand().getAmount(), (short) 0, (byte) 3));
+        ItemStack i = player.getItemInHand();
+        if (i.getType() == Material.SKULL_ITEM) {
+            i.setDurability((short) 3);
             player.updateInventory();
-            new Head((CraftItemStack) player.getItemInHand()).setName(args[0]);
+            SkullMeta meta = (SkullMeta) i.getItemMeta();
+            meta.setOwner(args[0]);
+            i.setItemMeta(meta);
+            player.setItemInHand(i);
             sender.sendMessage(ChatColor.GREEN + "Set name " + args[0]);
         } else {
             sender.sendMessage(ChatColor.RED + "That's not a head");

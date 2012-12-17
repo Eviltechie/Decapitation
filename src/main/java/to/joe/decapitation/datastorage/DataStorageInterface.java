@@ -33,7 +33,8 @@ public interface DataStorageInterface {
     public List<Bounty> getUnclaimedBounties(String issuer) throws DataStorageException;
 
     /**
-     * Gets uncollected bounties sorted by highest reward limiting between min and max
+     * Gets uncollected bounties sorted by highest reward limiting between min
+     * and max
      * 
      * @param min
      *            The starting result
@@ -45,7 +46,8 @@ public interface DataStorageInterface {
     public List<Bounty> getBounties(int min, int max) throws DataStorageException;
 
     /**
-     * Gets a list of uncollected bounties that match the specified name sorted A-Z
+     * Gets a list of uncollected bounties that match the specified name sorted
+     * A-Z
      * 
      * @param hunted
      *            Name to search for

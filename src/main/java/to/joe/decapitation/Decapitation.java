@@ -5,9 +5,13 @@ import java.sql.SQLException;
 import java.util.logging.Level;
 
 import net.milkbowl.vault.economy.Economy;
+import net.minecraft.server.v1_4_5.NBTTagCompound;
+import net.minecraft.server.v1_4_5.TileEntity;
 
 import org.bukkit.ChatColor;
-import org.bukkit.craftbukkit.v1_4_5.inventory.CraftItemStack;
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.craftbukkit.v1_4_5.CraftWorld;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -15,6 +19,8 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.SkullMeta;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -28,8 +34,6 @@ import to.joe.decapitation.datastorage.YamlDataStorageImplementation;
 
 public class Decapitation extends JavaPlugin implements Listener {
 
-    public static final int HEAD = 397;
-    public static final int HEADBLOCK = 144;
     double allDeaths;
     double killedByPlayer;
     public boolean bounties = false;
@@ -115,9 +119,11 @@ public class Decapitation extends JavaPlugin implements Listener {
             getLogger().log(Level.SEVERE, "Error getting if player has bounty", e);
         }
         if (p.hasPermission("decapitation.dropheads") && (allDeaths > Math.random() || ((killedByPlayer > Math.random()) && k != null)) && (k == null || (k != null && k.hasPermission("decapitation.collectheads")))) {
-            CraftItemStack c = new CraftItemStack(HEAD, 1, (short) 0, (byte) 3);
-            new Head(c).setName(event.getEntity().getName());
-            event.getDrops().add(c);
+            ItemStack i = new ItemStack(Material.SKULL_ITEM, 1, (short) 3);
+            SkullMeta meta = (SkullMeta) i.getItemMeta();
+            meta.setOwner(event.getEntity().getName());
+            i.setItemMeta(meta);
+            event.getDrops().add(i);
         }
     }
 
@@ -142,8 +148,13 @@ public class Decapitation extends JavaPlugin implements Listener {
 
     @EventHandler
     public void onInteract(PlayerInteractEvent event) {
-        if (event.getAction() == Action.RIGHT_CLICK_BLOCK && event.getPlayer().hasPermission("decapitation.info") && event.getClickedBlock().getTypeId() == HEADBLOCK) {
-            String name = new Head(new CraftItemStack(HEAD, 1, (short) 0, (byte) 3), event.getClickedBlock().getLocation()).getName();
+        if (event.getAction() == Action.RIGHT_CLICK_BLOCK && event.getPlayer().hasPermission("decapitation.info") && event.getClickedBlock().getType() == Material.SKULL) {
+            Location l = event.getClickedBlock().getLocation();
+            CraftWorld world = (CraftWorld) l.getWorld();
+            NBTTagCompound compound = new NBTTagCompound();
+            TileEntity e = world.getTileEntityAt(l.getBlockX(), l.getBlockY(), l.getBlockZ());
+            e.b(compound);
+            String name = compound.getString("ExtraType");
             if (name.equals("")) {
                 event.getPlayer().sendMessage(ChatColor.GREEN + "That head has no name attached");
             } else {

@@ -1,14 +1,13 @@
 package to.joe.decapitation.command;
 
 import org.bukkit.ChatColor;
+import org.bukkit.Material;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
-import org.bukkit.craftbukkit.v1_4_5.inventory.CraftItemStack;
 import org.bukkit.entity.Player;
-
-import to.joe.decapitation.Decapitation;
-import to.joe.decapitation.Head;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.SkullMeta;
 
 public class SpawnHeadCommand implements CommandExecutor {
 
@@ -34,14 +33,11 @@ public class SpawnHeadCommand implements CommandExecutor {
                 return true;
             }
         }
-        CraftItemStack c = new CraftItemStack(Decapitation.HEAD, numHeads, (short) 0, (byte) 3);
-        new Head(c).setName(args[0]);
-        int empty = ((Player) sender).getInventory().firstEmpty();
-        if (empty == -1) {
-            sender.sendMessage(ChatColor.RED + "No free room!");
-            return true;
-        }
-        ((Player) sender).getInventory().setItem(empty, c);
+        ItemStack i = new ItemStack(Material.SKULL_ITEM, numHeads, (short) 3);
+        SkullMeta meta = (SkullMeta) i.getItemMeta();
+        meta.setOwner(args[0]);
+        i.setItemMeta(meta);
+        ((Player) sender).getInventory().addItem(i);
         return true;
     }
 

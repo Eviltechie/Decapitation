@@ -6,15 +6,16 @@ import java.util.List;
 import java.util.logging.Level;
 
 import org.bukkit.ChatColor;
+import org.bukkit.Material;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
-import org.bukkit.craftbukkit.v1_4_5.inventory.CraftItemStack;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.SkullMeta;
 
 import to.joe.decapitation.Bounty;
 import to.joe.decapitation.Decapitation;
-import to.joe.decapitation.Head;
 import to.joe.decapitation.datastorage.DataStorageException;
 
 public class BountyCommand implements CommandExecutor {
@@ -81,21 +82,22 @@ public class BountyCommand implements CommandExecutor {
                 return true;
             }
             if (args[0].equalsIgnoreCase("claim") && sender.hasPermission("decapitation.bounty.claim")) {
-                if (p.getItemInHand().getTypeId() != Decapitation.HEAD) {
+                if (p.getItemInHand().getType() != Material.SKULL_ITEM) {
                     sender.sendMessage(ChatColor.RED + "That's not a head");
                     return true;
                 }
-                Head h = new Head((CraftItemStack) p.getItemInHand());
-                if (!h.isNamed()) {
+                ItemStack i = p.getItemInHand();
+                SkullMeta meta = (SkullMeta) i.getItemMeta();
+                if (!meta.hasOwner()) {
                     sender.sendMessage(ChatColor.RED + "That head is not named");
                     return true;
                 }
-                if (!plugin.canClaimOwn && h.getName().equals(p.getName())) {
+                if (!plugin.canClaimOwn && meta.getOwner().equals(p.getName())) {
                     sender.sendMessage(ChatColor.RED + "You may not turn in your own head");
                     return true;
                 }
                 try {
-                    String hunted = h.getName();
+                    String hunted = meta.getOwner();
                     Bounty b = plugin.getDsi().getBounty(hunted);
                     if (b != null) {
                         b.setHunter(p.getName());
@@ -105,16 +107,16 @@ public class BountyCommand implements CommandExecutor {
                         Decapitation.economy.depositPlayer(p.getName(), b.getReward());
                         sender.sendMessage(ChatColor.GREEN + "Sucessfully turned in bounty on " + b.getHunted() + " for " + Decapitation.economy.format(b.getReward()));
                         p.setItemInHand(null);
-                        Player i = plugin.getServer().getPlayer(b.getIssuer());
-                        if (i != null) {
-                            CraftItemStack c = new CraftItemStack(Decapitation.HEAD, 1, (short) 0, (byte) 3);
-                            new Head(c).setName(hunted);
-                            int empty = i.getInventory().firstEmpty();
-                            if (empty == -1) {
-                                i.sendMessage(ChatColor.RED + "Not enough room in your inventory to give you a skull");
+                        Player issuer = plugin.getServer().getPlayer(b.getIssuer());
+                        if (issuer != null) {
+                            ItemStack c = new ItemStack(Material.SKULL_ITEM, 1, (short) 3);
+                            SkullMeta me = (SkullMeta) c.getItemMeta();
+                            me.setOwner(hunted);
+                            c.setItemMeta(me);
+                            if (!issuer.getInventory().addItem(c).isEmpty()) {
+                                issuer.sendMessage(ChatColor.RED + "Not enough room in your inventory to give you a skull");
                                 return true;
                             }
-                            i.getInventory().setItem(empty, c);
                             b.setRedeemed(new Timestamp(new Date().getTime()));
                             plugin.getDsi().updateBounty(b);
                         }
@@ -157,14 +159,14 @@ public class BountyCommand implements CommandExecutor {
                         sender.sendMessage(ChatColor.RED + "Nothing to redeem");
                     }
                     for (Bounty b : bounties) {
-                        CraftItemStack c = new CraftItemStack(Decapitation.HEAD, 1, (short) 0, (byte) 3);
-                        new Head(c).setName(b.getHunted());
-                        int empty = ((Player) sender).getInventory().firstEmpty();
-                        if (empty == -1) {
-                            sender.sendMessage(ChatColor.RED + "Not enough free room");
+                        ItemStack i = new ItemStack(Material.SKULL_ITEM, 1, (short) 3);
+                        SkullMeta meta = (SkullMeta) i.getItemMeta();
+                        meta.setOwner(b.getHunted());
+                        i.setItemMeta(meta);
+                        if (!p.getInventory().addItem(i).isEmpty()) {
+                            p.sendMessage(ChatColor.RED + "Not enough room in your inventory to give you a skull");
                             return true;
                         }
-                        ((Player) sender).getInventory().setItem(empty, c);
                         b.setRedeemed(new Timestamp(new Date().getTime()));
                         plugin.getDsi().updateBounty(b);
                     }
