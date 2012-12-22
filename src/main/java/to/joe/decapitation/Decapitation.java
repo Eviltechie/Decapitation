@@ -5,13 +5,10 @@ import java.sql.SQLException;
 import java.util.logging.Level;
 
 import net.milkbowl.vault.economy.Economy;
-import net.minecraft.server.v1_4_5.NBTTagCompound;
-import net.minecraft.server.v1_4_5.TileEntity;
 
 import org.bukkit.ChatColor;
-import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.craftbukkit.v1_4_5.CraftWorld;
+import org.bukkit.block.Skull;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -38,6 +35,7 @@ public class Decapitation extends JavaPlugin implements Listener {
     double killedByPlayer;
     public boolean bounties = false;
     private boolean huntedDropOnly;
+    private boolean placeInKillerInv;
     public boolean canClaimOwn;
     private double tax;
     private DataStorageInterface dsi;
@@ -67,6 +65,7 @@ public class Decapitation extends JavaPlugin implements Listener {
 
         allDeaths = getConfig().getDouble("dropSkulls.allDeaths", 0);
         killedByPlayer = getConfig().getDouble("dropSkulls.killedByPlayer", 1);
+        placeInKillerInv = getConfig().getBoolean("dropSkulls.placeInKillerInv", false);
         tax = getConfig().getDouble("bounty.tax", 0.05D);
         huntedDropOnly = getConfig().getBoolean("bounty.huntedDropOnly", false);
         canClaimOwn = getConfig().getBoolean("bounty.canClaimOwn", true);
@@ -123,7 +122,13 @@ public class Decapitation extends JavaPlugin implements Listener {
             SkullMeta meta = (SkullMeta) i.getItemMeta();
             meta.setOwner(event.getEntity().getName());
             i.setItemMeta(meta);
-            event.getDrops().add(i);
+            if (placeInKillerInv && k != null) {
+                if (!k.getInventory().addItem(i).isEmpty()) {
+                    k.getWorld().dropItem(k.getLocation(), i);
+                }
+            } else {
+                event.getDrops().add(i);
+            }
         }
     }
 
@@ -149,16 +154,11 @@ public class Decapitation extends JavaPlugin implements Listener {
     @EventHandler
     public void onInteract(PlayerInteractEvent event) {
         if (event.getAction() == Action.RIGHT_CLICK_BLOCK && event.getPlayer().hasPermission("decapitation.info") && event.getClickedBlock().getType() == Material.SKULL) {
-            Location l = event.getClickedBlock().getLocation();
-            CraftWorld world = (CraftWorld) l.getWorld();
-            NBTTagCompound compound = new NBTTagCompound();
-            TileEntity e = world.getTileEntityAt(l.getBlockX(), l.getBlockY(), l.getBlockZ());
-            e.b(compound);
-            String name = compound.getString("ExtraType");
-            if (name.equals("")) {
-                event.getPlayer().sendMessage(ChatColor.GREEN + "That head has no name attached");
+            Skull s = (Skull) event.getClickedBlock().getState();
+            if (s.hasOwner()) {
+                event.getPlayer().sendMessage(ChatColor.GREEN + "The head of " + s.getOwner());
             } else {
-                event.getPlayer().sendMessage(ChatColor.GREEN + "The head of " + name);
+                event.getPlayer().sendMessage(ChatColor.GREEN + "That head has no name attached");
             }
         }
     }

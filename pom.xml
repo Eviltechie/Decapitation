@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>to.joe</groupId>
     <artifactId>Decapitation</artifactId>
-    <version>0.2.5</version>
+    <version>0.2.6</version>
     <name>Decapitation</name>
     <url>http://joe.to</url>
     <description>Drops heads on death</description>
@@ -16,6 +16,14 @@
         <repository>
             <id>bukkit-repo</id>
             <url>http://repo.bukkit.org/content/groups/public</url>
+            <releases>
+              <enabled>true</enabled>
+              <updatePolicy>always</updatePolicy>
+            </releases>
+            <snapshots>
+              <enabled>true</enabled>
+              <updatePolicy>always</updatePolicy>
+            </snapshots>
         </repository>
         <repository>
             <id>vault-repo</id>
@@ -26,8 +34,8 @@
      <dependencies>
         <dependency>
             <groupId>org.bukkit</groupId>
-            <artifactId>craftbukkit</artifactId>
-            <version>1.4.5-R0.3-SNAPSHOT</version>
+            <artifactId>bukkit</artifactId>
+            <version>1.4.6-R0.1</version>
         </dependency>
         <dependency>
             <groupId>net.milkbowl.vault</groupId>
