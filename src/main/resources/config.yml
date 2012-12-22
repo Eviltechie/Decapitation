@@ -1,6 +1,7 @@
 dropSkulls:
   allDeaths: 0
   killedByPlayer: 1
+  placeInKillerInv: false
 bounty:
   enabled: false
   tax: .05
