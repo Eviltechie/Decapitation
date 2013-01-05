@@ -38,6 +38,7 @@ public class Decapitation extends JavaPlugin implements Listener {
     private boolean placeInKillerInv;
     public boolean canClaimOwn;
     private double tax;
+    public int minimumBounty;
     private DataStorageInterface dsi;
 
     public static Economy economy = null;
@@ -69,6 +70,7 @@ public class Decapitation extends JavaPlugin implements Listener {
         tax = getConfig().getDouble("bounty.tax", 0.05D);
         huntedDropOnly = getConfig().getBoolean("bounty.huntedDropOnly", false);
         canClaimOwn = getConfig().getBoolean("bounty.canClaimOwn", true);
+        minimumBounty = getConfig().getInt("bounty.minimumBounty", 500);
 
         getServer().getPluginManager().registerEvents(this, this);
 
