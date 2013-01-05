@@ -264,8 +264,8 @@ public class BountyCommand implements CommandExecutor {
             try {
                 Bounty bounty = plugin.getDsi().getBounty(args[1], p.getName());
                 int reward = Integer.parseInt(args[2]);
-                if (reward <= 1000) {
-                    sender.sendMessage(ChatColor.RED + "You Must Set a Higher Bounty!");
+                if (reward <= 0 || reward < plugin.minimumBounty) {
+                    sender.sendMessage(ChatColor.RED + "You must set a higher bounty");
                     return true;
                 }
                 if (Decapitation.economy.has(p.getName(), reward + reward * plugin.getTax())) {
