@@ -213,7 +213,7 @@ public class BountyCommand implements CommandExecutor {
                     int page = Integer.parseInt(args[1]);
                     List<Bounty> bounties = plugin.getDsi().getBounties((page - 1) * 9, page * 9);
                     if (bounties.size() > 0) {
-                        sender.sendMessage(ChatColor.GREEN + "=========" + ChatColor.GOLD + "Bounties [Page 1 of " + (plugin.getDsi().getNumBounties() + 8) / 9 + "]" + ChatColor.GREEN + "=========");
+                        sender.sendMessage(ChatColor.GREEN + "=========" + ChatColor.GOLD + "Bounties [Page " + page + " of " + (plugin.getDsi().getNumBounties() + 8) / 9 + "]" + ChatColor.GREEN + "=========");
                         for (Bounty b : bounties) {
                             if (sender.hasPermission("decapitation.bounty.viewissuer")) {
                                 sender.sendMessage(ChatColor.GOLD + "" + b.getReward() + " - " + b.getHunted() + " placed by " + b.getIssuer());
