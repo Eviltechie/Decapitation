@@ -268,6 +268,10 @@ public class BountyCommand implements CommandExecutor {
                     sender.sendMessage(ChatColor.RED + "You must set a positive bounty");
                     return true;
                 }
+                if (reward < plugin.minimumBounty) {
+                    sender.sendMessage(ChatColor.RED + "You must place a bounty worth at least " + Decapitation.economy.format(plugin.minimumBounty));
+                    return true;
+                }
                 if (Decapitation.economy.has(p.getName(), reward + reward * plugin.getTax())) {
                     if (bounty == null) {
                         bounty = new Bounty(p.getName(), args[1], reward);
