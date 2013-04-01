@@ -14,7 +14,7 @@ commands:
     description: Spawns a player head with the given name
     permission: decapitation.spawnhead
     permission-message: You may not spawn heads
-    usage: /<command> [playername] <quantity>
+    usage: /<command> [playername] <quantity> <player>
   bounty:
     description: Place, claim, and search bounties bounties
     usage: /<command>

@@ -75,7 +75,7 @@ public class Decapitation extends JavaPlugin implements Listener {
         getServer().getPluginManager().registerEvents(this, this);
 
         getCommand("setname").setExecutor(new SetNameCommand());
-        getCommand("spawnhead").setExecutor(new SpawnHeadCommand());
+        getCommand("spawnhead").setExecutor(new SpawnHeadCommand(this));
         getCommand("bounty").setExecutor(new BountyCommand(this));
 
         if (getConfig().getBoolean("bounty.enabled")) {
