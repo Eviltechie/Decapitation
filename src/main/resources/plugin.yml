@@ -10,6 +10,11 @@ commands:
     permission: decapitation.setname
     permission-message: You may not set head names
     usage: /<command> [playername]
+  clearname:
+    description: Clears the name of a skull
+    permission: decapitation.clearname
+    permission-message: You may not clear head names
+    usage: /<command>
   spawnhead:
     description: Spawns a player head with the given name
     permission: decapitation.spawnhead
@@ -21,6 +26,8 @@ commands:
 permissions:
   decapitation.setname:
     description: Set the name of skulls
+  decapitation.clearname:
+    description: Clear the name of skulls
   decapitation.spawnhead:
     description: Spawn heads with a given name
     children:

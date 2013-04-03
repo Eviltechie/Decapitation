@@ -22,6 +22,7 @@ import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import to.joe.decapitation.command.BountyCommand;
+import to.joe.decapitation.command.ClearNameCommand;
 import to.joe.decapitation.command.SetNameCommand;
 import to.joe.decapitation.command.SpawnHeadCommand;
 import to.joe.decapitation.datastorage.DataStorageException;
@@ -75,6 +76,7 @@ public class Decapitation extends JavaPlugin implements Listener {
         getServer().getPluginManager().registerEvents(this, this);
 
         getCommand("setname").setExecutor(new SetNameCommand());
+        getCommand("clearname").setExecutor(new ClearNameCommand());
         getCommand("spawnhead").setExecutor(new SpawnHeadCommand(this));
         getCommand("bounty").setExecutor(new BountyCommand(this));
 
