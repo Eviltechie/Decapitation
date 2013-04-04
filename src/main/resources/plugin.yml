@@ -10,6 +10,7 @@ commands:
     permission: decapitation.setname
     permission-message: You may not set head names
     usage: /<command> [playername]
+    aliases: sn
   clearname:
     description: Clears the name of a skull
     permission: decapitation.clearname
