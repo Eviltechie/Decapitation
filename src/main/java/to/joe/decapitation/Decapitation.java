@@ -2,7 +2,10 @@ package to.joe.decapitation;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.logging.Level;
+
 
 import net.milkbowl.vault.economy.Economy;
 
@@ -21,6 +24,7 @@ import org.bukkit.inventory.meta.SkullMeta;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import org.kitteh.tag.AsyncPlayerReceiveNameTagEvent;
 import to.joe.decapitation.command.BountyCommand;
 import to.joe.decapitation.command.ClearNameCommand;
 import to.joe.decapitation.command.SetNameCommand;
@@ -41,6 +45,7 @@ public class Decapitation extends JavaPlugin implements Listener {
     private double tax;
     public double minimumBounty;
     private DataStorageInterface dsi;
+    private String color;
 
     public static Economy economy = null;
 
@@ -72,6 +77,7 @@ public class Decapitation extends JavaPlugin implements Listener {
         minimumBounty = getConfig().getDouble("bounty.minimum", 10);
         huntedDropOnly = getConfig().getBoolean("bounty.huntedDropOnly", false);
         canClaimOwn = getConfig().getBoolean("bounty.canClaimOwn", true);
+        color = getConfig().getString("tagapi.wanted-color");
 
         getServer().getPluginManager().registerEvents(this, this);
 
@@ -79,6 +85,7 @@ public class Decapitation extends JavaPlugin implements Listener {
         getCommand("clearname").setExecutor(new ClearNameCommand());
         getCommand("spawnhead").setExecutor(new SpawnHeadCommand(this));
         getCommand("bounty").setExecutor(new BountyCommand(this));
+
 
         if (getConfig().getBoolean("bounty.enabled")) {
             bounties = setupEconomy();
@@ -109,7 +116,23 @@ public class Decapitation extends JavaPlugin implements Listener {
         else
             getLogger().info("Bounties not enabled");
     }
-
+    @EventHandler
+    public void onNameTagChange(AsyncPlayerReceiveNameTagEvent event){
+        Player p = event.getNamedPlayer();
+        ChatColor c = color.contains("&") ? ChatColor.getByChar(color.substring(0,1)) : ChatColor.valueOf(color);
+        if(c == null){
+            getLogger().log(Level.SEVERE, "Error parsing color to plugin. Check your config");
+            return;
+        }
+        try {
+            Bounty b = getDsi().getBounty(p.getName());
+            if(p.hasPermission("decapitation.wanted-color") && b != null && c != null){
+                event.setTag(c+p.getName());
+            }
+        } catch (DataStorageException e) {
+            getLogger().log(Level.SEVERE, "Error getting if player has bounty", e);
+        }
+    }
     @EventHandler
     public void onDeath(PlayerDeathEvent event) {
         Player p = event.getEntity();
