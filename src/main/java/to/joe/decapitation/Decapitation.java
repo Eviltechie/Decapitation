@@ -119,7 +119,7 @@ public class Decapitation extends JavaPlugin implements Listener {
     @EventHandler
     public void onNameTagChange(AsyncPlayerReceiveNameTagEvent event){
         Player p = event.getNamedPlayer();
-        ChatColor c = color.contains("&") ? ChatColor.getByChar(color.substring(0,1)) : ChatColor.valueOf(color);
+        ChatColor c = color.charAt(0) == '&' ? ChatColor.getByChar(color.substring(0,1)) : ChatColor.valueOf(color);
         if(c == null){
             getLogger().log(Level.SEVERE, "Error parsing color to plugin. Check your config");
             return;
