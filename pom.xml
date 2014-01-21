@@ -30,7 +30,7 @@
             <url>http://ci.herocraftonline.com/plugin/repository/everything</url>
         </repository>
         <repository>
-            <id>mbaxter-repo</id>
+            <id>kitteh-repo</id>
             <url>http://repo.kitteh.org/content/repositories/public/</url>
         </repository>
     </repositories>
