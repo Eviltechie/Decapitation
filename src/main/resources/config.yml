@@ -1,3 +1,5 @@
+tagapi
+  wanted-color: RED
 dropSkulls:
   allDeaths: 0
   killedByPlayer: 1

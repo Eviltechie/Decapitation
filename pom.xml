@@ -29,6 +29,10 @@
             <id>vault-repo</id>
             <url>http://ci.herocraftonline.com/plugin/repository/everything</url>
         </repository>
+        <repository>
+            <id>mbaxter-repo</id>
+            <url>http://repo.kitteh.org/content/repositories/public/</url>
+        </repository>
     </repositories>
     
      <dependencies>
@@ -41,6 +45,11 @@
             <groupId>net.milkbowl.vault</groupId>
             <artifactId>Vault</artifactId>
             <version>1.2.30</version>
+        </dependency>
+        <dependency>
+            <groupId>org.kitteh</groupId>
+            <artifactId>tagapi</artifactId>
+            <version>RELEASE</version>
         </dependency>
     </dependencies>
     
