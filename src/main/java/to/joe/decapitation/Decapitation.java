@@ -24,7 +24,7 @@ import org.bukkit.inventory.meta.SkullMeta;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import org.kitteh.tag.AsyncPlayerReceiveNameTagEvent;
+import org.kitteh.tag.PlayerReceiveNameTagEvent;
 import to.joe.decapitation.command.BountyCommand;
 import to.joe.decapitation.command.ClearNameCommand;
 import to.joe.decapitation.command.SetNameCommand;
@@ -117,7 +117,7 @@ public class Decapitation extends JavaPlugin implements Listener {
             getLogger().info("Bounties not enabled");
     }
     @EventHandler
-    public void onNameTagChange(AsyncPlayerReceiveNameTagEvent event){
+    public void onNameTagChange(PlayerReceiveNameTagEvent event){
         Player p = event.getNamedPlayer();
         ChatColor c = color.charAt(0) == '&' ? ChatColor.getByChar(color.substring(0,1)) : ChatColor.valueOf(color);
         if(c == null){
