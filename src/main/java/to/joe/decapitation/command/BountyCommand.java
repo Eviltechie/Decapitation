@@ -86,9 +86,6 @@ public class BountyCommand implements CommandExecutor {
                     sender.sendMessage(ChatColor.RED + "That's not a head");
                     return true;
                 }
-                if (!plugin.getCurrentBounties().contains(plugin.getServer().getPlayerExact(args[1]).getName())) {
-                    return true;
-                }
                 ItemStack i = p.getItemInHand();
                 SkullMeta meta = (SkullMeta) i.getItemMeta();
                 if (!meta.hasOwner()) {
@@ -97,6 +94,9 @@ public class BountyCommand implements CommandExecutor {
                 }
                 if (!plugin.canClaimOwn && meta.getOwner().equals(p.getName())) {
                     sender.sendMessage(ChatColor.RED + "You may not turn in your own head");
+                    return true;
+                }
+                if (!plugin.getCurrentBounties().contains(meta.getOwner())) {
                     return true;
                 }
                 try {
@@ -163,15 +163,15 @@ public class BountyCommand implements CommandExecutor {
                         sender.sendMessage(ChatColor.RED + "Nothing to redeem");
                         return true;
                     }
-                    if (!plugin.getCurrentBounties().contains(plugin.getServer().getPlayerExact(args[1]).getName())) {
-                        return true;
-                    }
 
                     for (Bounty b : bounties) {
                         ItemStack i = new ItemStack(Material.SKULL_ITEM, 1, (short) 3);
                         SkullMeta meta = (SkullMeta) i.getItemMeta();
                         meta.setOwner(b.getHunted());
                         i.setItemMeta(meta);
+                        if (!plugin.getCurrentBounties().contains(b.getHunted())) {
+                            return true;
+                        }
                         if (!p.getInventory().addItem(i).isEmpty()) {
                             p.sendMessage(ChatColor.RED + "Not enough room in your inventory to give you a skull");
                             return true;
@@ -249,7 +249,7 @@ public class BountyCommand implements CommandExecutor {
                 }
                 try {
                     Bounty bounty = plugin.getDsi().getBounty(args[1], p.getName());
-                    if (!plugin.getCurrentBounties().contains(plugin.getServer().getPlayerExact(args[1]).getName())) {
+                    if (!plugin.getCurrentBounties().contains(args[1])) {
                         return true;
                     }
                     if (bounty != null) {
@@ -275,12 +275,12 @@ public class BountyCommand implements CommandExecutor {
                 sender.sendMessage(ChatColor.RED + "That doesn't appear to be a valid username");
                 return true;
             }
-            if (plugin.getCurrentBounties().contains(plugin.getServer().getPlayerExact(args[1]).getName())) {
-                return true;
-            }
             try {
                 Bounty bounty = plugin.getDsi().getBounty(args[1], p.getName());
                 int reward = Integer.parseInt(args[2]);
+                if (plugin.getCurrentBounties().contains(args[1])) {
+                    return true;
+                }
                 if (reward <= 0) {
                     sender.sendMessage(ChatColor.RED + "You must set a positive bounty");
                     return true;
@@ -292,7 +292,7 @@ public class BountyCommand implements CommandExecutor {
                 if (Decapitation.economy.has(p.getName(), reward + reward * plugin.getTax())) {
                     if (bounty == null) {
                         bounty = new Bounty(p.getName(), args[1], reward);
-                        plugin.getCurrentBounties().add(plugin.getServer().getPlayerExact(args[1]).getName());
+                        plugin.getCurrentBounties().add(args[1]);
                         plugin.getDsi().addBounty(bounty);
                         Decapitation.economy.withdrawPlayer(p.getName(), reward + reward * plugin.getTax());
                         sender.sendMessage(ChatColor.GREEN + "Added bounty against " + args[1]);
