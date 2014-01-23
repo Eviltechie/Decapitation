@@ -3,11 +3,8 @@ package to.joe.decapitation;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.logging.Level;
-
 
 import net.milkbowl.vault.economy.Economy;
 
@@ -25,8 +22,8 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.SkullMeta;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
-
 import org.kitteh.tag.PlayerReceiveNameTagEvent;
+
 import to.joe.decapitation.command.BountyCommand;
 import to.joe.decapitation.command.ClearNameCommand;
 import to.joe.decapitation.command.SetNameCommand;
@@ -63,7 +60,10 @@ public class Decapitation extends JavaPlugin implements Listener {
     public DataStorageInterface getDsi() {
         return dsi;
     }
-    public List<String> getCurrentBounties(){return currentBounties;}
+
+    public List<String> getCurrentBounties() {
+        return currentBounties;
+    }
 
     public double getTax() {
         return tax;
@@ -89,7 +89,6 @@ public class Decapitation extends JavaPlugin implements Listener {
         getCommand("clearname").setExecutor(new ClearNameCommand());
         getCommand("spawnhead").setExecutor(new SpawnHeadCommand(this));
         getCommand("bounty").setExecutor(new BountyCommand(this));
-
 
         if (getConfig().getBoolean("bounty.enabled")) {
             bounties = setupEconomy();
@@ -120,18 +119,20 @@ public class Decapitation extends JavaPlugin implements Listener {
         else
             getLogger().info("Bounties not enabled");
     }
+
     @EventHandler
-    public void onNameTagChange(PlayerReceiveNameTagEvent event){
+    public void onNameTagChange(PlayerReceiveNameTagEvent event) {
         Player p = event.getNamedPlayer();
-        ChatColor c = color.charAt(0) == '&' ? ChatColor.getByChar(color.substring(0,1)) : ChatColor.valueOf(color);
-        if(c == null){
+        ChatColor c = color.charAt(0) == '&' ? ChatColor.getByChar(color.substring(0, 1)) : ChatColor.valueOf(color);
+        if (c == null) {
             getLogger().log(Level.SEVERE, "Error parsing color to plugin. Check your config");
             return;
         }
-            if(p.hasPermission("decapitation.wanted-color") && getCurrentBounties().contains(p.getName()) && c != null){
-                event.setTag(c+p.getName());
-           }
+        if (p.hasPermission("decapitation.wanted-color") && getCurrentBounties().contains(p.getName()) && c != null) {
+            event.setTag(c + p.getName());
+        }
     }
+
     @EventHandler
     public void onDeath(PlayerDeathEvent event) {
         Player p = event.getEntity();
@@ -162,10 +163,10 @@ public class Decapitation extends JavaPlugin implements Listener {
     public void onPlayerJoin(PlayerJoinEvent event) {
         try {
             Bounty b = getDsi().getBounty(event.getPlayer().getName());
-            if(b == null){
+            if (b == null) {
                 return;
             }
-            if(b != null && !currentBounties.contains(event.getPlayer().getName())){
+            if (b != null && !currentBounties.contains(event.getPlayer().getName())) {
                 currentBounties.add(event.getPlayer().getName());
                 event.getPlayer().sendMessage(ChatColor.GOLD + "You currently have a bounty on you!");
             }

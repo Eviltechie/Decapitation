@@ -86,7 +86,7 @@ public class BountyCommand implements CommandExecutor {
                     sender.sendMessage(ChatColor.RED + "That's not a head");
                     return true;
                 }
-                if(!plugin.getCurrentBounties().contains(plugin.getServer().getPlayerExact(args[1]).getName())){
+                if (!plugin.getCurrentBounties().contains(plugin.getServer().getPlayerExact(args[1]).getName())) {
                     return true;
                 }
                 ItemStack i = p.getItemInHand();
@@ -163,7 +163,7 @@ public class BountyCommand implements CommandExecutor {
                         sender.sendMessage(ChatColor.RED + "Nothing to redeem");
                         return true;
                     }
-                    if(!plugin.getCurrentBounties().contains(plugin.getServer().getPlayerExact(args[1]).getName())){
+                    if (!plugin.getCurrentBounties().contains(plugin.getServer().getPlayerExact(args[1]).getName())) {
                         return true;
                     }
 
@@ -249,7 +249,7 @@ public class BountyCommand implements CommandExecutor {
                 }
                 try {
                     Bounty bounty = plugin.getDsi().getBounty(args[1], p.getName());
-                    if(!plugin.getCurrentBounties().contains(plugin.getServer().getPlayerExact(args[1]).getName())){
+                    if (!plugin.getCurrentBounties().contains(plugin.getServer().getPlayerExact(args[1]).getName())) {
                         return true;
                     }
                     if (bounty != null) {
@@ -275,7 +275,7 @@ public class BountyCommand implements CommandExecutor {
                 sender.sendMessage(ChatColor.RED + "That doesn't appear to be a valid username");
                 return true;
             }
-            if(plugin.getCurrentBounties().contains(plugin.getServer().getPlayerExact(args[1]).getName())){
+            if (plugin.getCurrentBounties().contains(plugin.getServer().getPlayerExact(args[1]).getName())) {
                 return true;
             }
             try {
