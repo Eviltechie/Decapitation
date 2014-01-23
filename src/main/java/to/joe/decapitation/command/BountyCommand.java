@@ -96,6 +96,9 @@ public class BountyCommand implements CommandExecutor {
                     sender.sendMessage(ChatColor.RED + "You may not turn in your own head");
                     return true;
                 }
+                if (!plugin.getCurrentBounties().contains(meta.getOwner())) {
+                    return true;
+                }
                 try {
                     String hunted = meta.getOwner();
                     Bounty b = plugin.getDsi().getBounty(hunted);
@@ -103,6 +106,7 @@ public class BountyCommand implements CommandExecutor {
                         b.setHunter(p.getName());
                         b.setHunted(hunted);
                         b.setTurnedIn(new Timestamp(new Date().getTime()));
+                        plugin.getCurrentBounties().remove(hunted);
                         plugin.getDsi().updateBounty(b);
                         Decapitation.economy.depositPlayer(p.getName(), b.getReward());
                         sender.sendMessage(ChatColor.GREEN + "Sucessfully turned in bounty on " + b.getHunted() + " for " + Decapitation.economy.format(b.getReward()));
@@ -157,16 +161,22 @@ public class BountyCommand implements CommandExecutor {
                     List<Bounty> bounties = plugin.getDsi().getUnclaimedBounties(p.getName());
                     if (bounties.size() == 0) {
                         sender.sendMessage(ChatColor.RED + "Nothing to redeem");
+                        return true;
                     }
+
                     for (Bounty b : bounties) {
                         ItemStack i = new ItemStack(Material.SKULL_ITEM, 1, (short) 3);
                         SkullMeta meta = (SkullMeta) i.getItemMeta();
                         meta.setOwner(b.getHunted());
                         i.setItemMeta(meta);
+                        if (!plugin.getCurrentBounties().contains(b.getHunted())) {
+                            return true;
+                        }
                         if (!p.getInventory().addItem(i).isEmpty()) {
                             p.sendMessage(ChatColor.RED + "Not enough room in your inventory to give you a skull");
                             return true;
                         }
+                        plugin.getCurrentBounties().remove(b.getHunted());
                         b.setRedeemed(new Timestamp(new Date().getTime()));
                         plugin.getDsi().updateBounty(b);
                     }
@@ -239,7 +249,11 @@ public class BountyCommand implements CommandExecutor {
                 }
                 try {
                     Bounty bounty = plugin.getDsi().getBounty(args[1], p.getName());
+                    if (!plugin.getCurrentBounties().contains(args[1])) {
+                        return true;
+                    }
                     if (bounty != null) {
+                        plugin.getCurrentBounties().remove(plugin.getServer().getPlayerExact(args[1]).getName());
                         plugin.getDsi().deleteBounty(bounty);
                         Decapitation.economy.depositPlayer(p.getName(), bounty.getReward() - bounty.getReward() * plugin.getTax());
                         sender.sendMessage(ChatColor.GREEN + "Deleted bounty against " + bounty.getHunted() + " for " + Decapitation.economy.format(bounty.getReward()));
@@ -264,6 +278,9 @@ public class BountyCommand implements CommandExecutor {
             try {
                 Bounty bounty = plugin.getDsi().getBounty(args[1], p.getName());
                 int reward = Integer.parseInt(args[2]);
+                if (plugin.getCurrentBounties().contains(args[1])) {
+                    return true;
+                }
                 if (reward <= 0) {
                     sender.sendMessage(ChatColor.RED + "You must set a positive bounty");
                     return true;
@@ -275,6 +292,7 @@ public class BountyCommand implements CommandExecutor {
                 if (Decapitation.economy.has(p.getName(), reward + reward * plugin.getTax())) {
                     if (bounty == null) {
                         bounty = new Bounty(p.getName(), args[1], reward);
+                        plugin.getCurrentBounties().add(args[1]);
                         plugin.getDsi().addBounty(bounty);
                         Decapitation.economy.withdrawPlayer(p.getName(), reward + reward * plugin.getTax());
                         sender.sendMessage(ChatColor.GREEN + "Added bounty against " + args[1]);
