@@ -2,7 +2,9 @@ package to.joe.decapitation;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 
@@ -46,6 +48,7 @@ public class Decapitation extends JavaPlugin implements Listener {
     public double minimumBounty;
     private DataStorageInterface dsi;
     private String color;
+    public List<String> currentBounties = new ArrayList<String>();
 
     public static Economy economy = null;
 
@@ -60,6 +63,7 @@ public class Decapitation extends JavaPlugin implements Listener {
     public DataStorageInterface getDsi() {
         return dsi;
     }
+    public List<String> getCurrentBounties(){return currentBounties;}
 
     public double getTax() {
         return tax;
@@ -124,14 +128,9 @@ public class Decapitation extends JavaPlugin implements Listener {
             getLogger().log(Level.SEVERE, "Error parsing color to plugin. Check your config");
             return;
         }
-        try {
-            Bounty b = getDsi().getBounty(p.getName());
-            if(p.hasPermission("decapitation.wanted-color") && b != null && c != null){
+            if(p.hasPermission("decapitation.wanted-color") && getCurrentBounties().contains(p.getName()) && c != null){
                 event.setTag(c+p.getName());
-            }
-        } catch (DataStorageException e) {
-            getLogger().log(Level.SEVERE, "Error getting if player has bounty", e);
-        }
+           }
     }
     @EventHandler
     public void onDeath(PlayerDeathEvent event) {
@@ -161,6 +160,18 @@ public class Decapitation extends JavaPlugin implements Listener {
 
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent event) {
+        try {
+            Bounty b = getDsi().getBounty(event.getPlayer().getName());
+            if(b == null){
+                return;
+            }
+            if(b != null && !currentBounties.contains(event.getPlayer().getName())){
+                currentBounties.add(event.getPlayer().getName());
+                event.getPlayer().sendMessage(ChatColor.GOLD + "You currently have a bounty on you!");
+            }
+        } catch (DataStorageException e) {
+            e.printStackTrace();
+        }
         if (bounties) {
             int unclaimedHeads = 0;
             try {
